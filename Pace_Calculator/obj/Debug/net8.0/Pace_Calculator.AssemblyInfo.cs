@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Pace_Calculator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+498dd02661a66f3ef2adc1b8e3edcd2f139a4c02")]
 [assembly: System.Reflection.AssemblyProductAttribute("Pace_Calculator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Pace_Calculator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
