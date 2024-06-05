@@ -13,5 +13,6 @@ internal class Calculators
     {
         //formula is pace = total time / total units
         //will need to consider rounding and formatting
+        //think about method overload for different inputs ie. user gives total time and distance but not pace
     }
 }
