@@ -8,6 +8,7 @@ internal class Calculators
     double minutes? = 30;
     double seconds? = 0;
     double pace? = 0;
+    List<Distance_Marker> distance_Markers= new List<Distance_Marker>();
 
     public Calculators()
     {
