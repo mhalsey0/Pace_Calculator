@@ -1,19 +1,54 @@
 
 internal class Calculators
 {
-    //need to connect to input from UI
-    string unit = "miles"; //can have option for km, meters, or yards as well
-    double distance? = 3;
-    double hours? = 0;
-    double minutes? = 30;
-    double seconds? = 0;
-    double pace? = 0;
-    List<Distance_Marker> distance_Markers= new List<Distance_Marker>();
-
-    public Calculators()
+    //Will need to account for units in formatting for display
+    public static TimeSpan PaceCalculator(string userInputTotalHours, string userInputTotalMinutes, string userInputTotalSeconds, string userInputTotalDistance)
     {
-        //formula is pace = total time / total units
-        //will need to consider rounding and formatting
-        //think about method overload for different inputs ie. user gives total time and distance but not pace
+        double.TryParse(userInputTotalHours, out double totalHours);
+        double.TryParse(userInputTotalMinutes, out double totalMinutes);
+        double.TryParse(userInputTotalSeconds, out double totalSeconds);
+        double.TryParse(userInputTotalDistance, out double totalDistance);
+        
+        TimeSpan pace = (TimeSpan.FromHours(totalHours) + 
+                         TimeSpan.FromMinutes(totalMinutes) + 
+                         TimeSpan.FromSeconds(totalSeconds)) 
+                         /
+                         totalDistance;
+
+        return pace; //pace is equal to total time divided by total distance
+    }
+    public static double DistanceCalculator(string userInputTotalHours, string userInputTotalMinutes, string userInputTotalSeconds, string userInputPaceHours, string userInputPaceMinutes, string userInputPaceSeconds)
+    {
+        double.TryParse(userInputTotalHours, out double totalHours);
+        double.TryParse(userInputTotalMinutes, out double totalMinutes);
+        double.TryParse(userInputTotalSeconds, out double totalSeconds);
+        double.TryParse(userInputPaceHours, out double paceHours);
+        double.TryParse(userInputPaceMinutes, out double paceMinutes);
+        double.TryParse(userInputPaceSeconds, out double paceSeconds);
+        
+        double distance = ( TimeSpan.FromHours(totalHours) +
+                            TimeSpan.FromMinutes(totalMinutes) +
+                            TimeSpan.FromSeconds(totalSeconds))
+                            / (
+                            TimeSpan.FromHours(paceHours) + 
+                            TimeSpan.FromMinutes(paceMinutes) +
+                            TimeSpan.FromSeconds(paceSeconds)); 
+
+        return distance; //distance is equal to total time divided  by pace
+    }
+    public static TimeSpan TotalTimeCalculator(string userInputPaceHours, string userInputPaceMinutes, string userInputPaceSeconds, string userInputTotalDistance)
+    {
+        double.TryParse(userInputPaceHours, out double paceHours);
+        double.TryParse(userInputPaceMinutes, out double paceMinutes);
+        double.TryParse(userInputPaceSeconds, out double paceSeconds);
+        double.TryParse(userInputTotalDistance, out double totalDistance);
+        
+        TimeSpan totalTime =  (TimeSpan.FromHours(paceHours) + 
+                             TimeSpan.FromMinutes(paceMinutes) +
+                             TimeSpan.FromSeconds(paceSeconds))
+                             *
+                             totalDistance;
+
+        return totalTime; //total time is equal to pace multiplied by distance
     }
 }
