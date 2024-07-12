@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/mhalsey/Documents/Projects/Test Web App/Test Web App.csproj",
+      "projectUniqueName": "/Users/mhalsey/Documents/Projects/Pace_Calculator/Test Web App.csproj",
       "projectName": "Test Web App",
-      "projectPath": "/Users/mhalsey/Documents/Projects/Test Web App/Test Web App.csproj",
+      "projectPath": "/Users/mhalsey/Documents/Projects/Pace_Calculator/Test Web App.csproj",
       "packagesPath": "/Users/mhalsey/.nuget/packages/",
-      "outputPath": "/Users/mhalsey/Documents/Projects/Test Web App/obj/",
+      "outputPath": "/Users/mhalsey/Documents/Projects/Pace_Calculator/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/mhalsey/.nuget/NuGet/NuGet.Config"
