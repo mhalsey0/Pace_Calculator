@@ -1,5 +1,5 @@
 
-interface Icalculators
+interface ICalculators
 {
     //Will need to account for units in formatting for display
     public static TimeSpan PaceCalculator(string userInputTotalHours, string userInputTotalMinutes, string userInputTotalSeconds, string userInputTotalDistance)
