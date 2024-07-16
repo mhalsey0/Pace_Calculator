@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Test_Web_App.Pages;
+namespace Pace_Calculator.Pages;
 
 public class PrivacyModel : PageModel
 {

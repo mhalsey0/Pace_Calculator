@@ -1,6 +1,5 @@
-internal class UserInput : ICalculators
+public class UserInput : ICalculators
 {
-    
     double? PaceHours { get; set; }
     double? PaceMinutes { get; set;}   
     double? PaceSeconds { get; set;}
