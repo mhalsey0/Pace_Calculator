@@ -44,10 +44,10 @@ interface ICalculators
         double.TryParse(userInputTotalDistance, out double totalDistance);
         
         TimeSpan totalTime =  (TimeSpan.FromHours(paceHours) + 
-                             TimeSpan.FromMinutes(paceMinutes) +
-                             TimeSpan.FromSeconds(paceSeconds))
+                               TimeSpan.FromMinutes(paceMinutes) +
+                               TimeSpan.FromSeconds(paceSeconds))
                              *
-                             totalDistance;
+                               totalDistance;
 
         return totalTime; //total time is equal to pace multiplied by distance
     }
