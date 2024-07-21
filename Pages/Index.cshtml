@@ -10,67 +10,68 @@
     <p>Please enter at least two of the three fields.</p>
 </div>
 <body>
-  <form method="post" >
+  <form method="post">
     <fieldset>
       <legend>Pace</legend>
       <div>
-        <input asp-for="paceHours" class="form-control" />
-        <label asp-for="paceHours">HH</label>
+        <input asp-for="PaceHours" class="form-control" />
+        <label asp-for="PaceHours">HH</label>
       </div>
       <div>
-        <label asp-for="paceMinutes">MM</label>
-        <input asp-for="paceMinutes" class="form-contorl" />
+        <input asp-for="PaceMinutes" class="form-contorl" />
+        <label asp-for="PaceMinutes">MM</label>
       </div>
       <div>
-        <label asp-for="paceSeconds">SS.M</label>
-        <input asp-for="paceSeconds" class="form-control"/>
+        <input asp-for="PaceSeconds" class="form-control"/>
+        <label asp-for="PaceSeconds">SS.M</label>
       </div>
     </fieldset>
     <fieldset>
       <legend>Distance</legend>
       <div>
-        <label for="UserInput.Distance">Enter the Distance</label>
-        <input type="number" name="Distance" value="" />
+        <input asp-for="Distance" class="form-control"/>
+        <label asp-for="Distance">Distance</label>
       </div>
     </fieldset>
     <fieldset>
       <legend>Total Time</legend>
       <div>
-        <label asp-for="totalHours">HH</label>
-        <input asp-for="totalHours" class="form-control" />
+        <input asp-for="TotalHours" class="form-control" />
+        <label asp-for="TotalHours">HH</label>
       </div>
       <div>
-        <label asp-for="totalMinutes">MM</label>
-        <input asp-for="totalMinutes" class="form-contorl" />
+        <input asp-for="TotalMinutes" class="form-contorl" />
+        <label asp-for="TotalMinutes">MM</label>
       </div>
       <div>
-        <label asp-for="totalSeconds">SS.M</label>
-        <input asp-for="totalSeconds" class="form-control"/>
+        <input asp-for="TotalSeconds" class="form-control"/>
+        <label asp-for="TotalSeconds">SS.M</label>
       </div>
     </fieldset>
     <fieldset>
       <legend>Select your unit of distance</legend>
       <div>
-          <input type="radio" id="km" name="UserInput.Unit" value="km" checked />
+          <input type="radio" id="km" name="Unit" value="km" checked />
           <label for="km">km</label>
       </div>
       <div>
-          <input type="radio" id="miles" name="UserInput.Unit" value="miles" />
+          <input type="radio" id="miles" name="Unit" value="miles" />
           <label for="miles">miles</label>
       </div>
       <div>
-          <input type="radio" id="meters" name="UserInput.Unit" value="meters" />
+          <input type="radio" id="meters" name="Unit" value="meters" />
           <label for="meters">meters</label>
       </div>
       <div>
-          <input type="radio" id="meters" name="UserInput.Unit" value="meters" />
+          <input type="radio" id="meters" name="Unit" value="meters" />
           <label for="meters">meters</label>
       </div>
       <div>
-          <input type="radio" id="feet" name="UserInput.Unit" value="feet" />
+          <input type="radio" id="feet" name="Unit" value="feet" />
           <label for="feet">feet</label>
       </div>
     </fieldset>
+    <button type="submit" class="btn btn-primary">Calculate</button>
   </form>
         <div>
           <form method="post">
