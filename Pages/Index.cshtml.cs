@@ -13,7 +13,7 @@ namespace Pace_Calculator.Pages
         [BindProperty]
         public int PaceSeconds { get; set; }
         [BindProperty]
-        public double Distance { get; set; }
+        public double InputDistance { get; set; }
         [BindProperty]
         public int TotalHours { get; set; }
         [BindProperty]
@@ -22,16 +22,18 @@ namespace Pace_Calculator.Pages
         public int TotalSeconds { get; set; }
         [BindProperty]
         [Required]
-        public string Unit { get; set; }
+        public required string Unit { get; set; }
+        [BindProperty]
+        public string? GpxFile { get; set; }
 
 
-        private readonly ILogger<IndexModel> _logger;
+/*        private readonly ILogger<IndexModel> _logger;
 
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
         }
-
+*/
         public void OnGet()
         {
 
@@ -41,11 +43,14 @@ namespace Pace_Calculator.Pages
             UserInput userInput = new()
             {
                 Pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds),
-                Distance = Distance,
+                Distance = InputDistance,
                 TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
                 Unit = Unit
             };
             Calculators.Calculate(userInput);
+            //InputDistance = (double)userInput.Distance;
+
+            Console.WriteLine($"{userInput.TotalTime},{userInput.Pace},{userInput.Distance}");
             return;
         }
     }

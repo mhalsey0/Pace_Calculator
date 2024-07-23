@@ -18,7 +18,7 @@
         <label asp-for="PaceHours">HH</label>
       </div>
       <div>
-        <input asp-for="PaceMinutes" class="form-contorl" />
+        <input asp-for="PaceMinutes" class="form-control" />
         <label asp-for="PaceMinutes">MM</label>
       </div>
       <div>
@@ -29,8 +29,8 @@
     <fieldset>
       <legend>Distance</legend>
       <div>
-        <input asp-for="Distance" class="form-control"/>
-        <label asp-for="Distance">Distance</label>
+        <input asp-for="InputDistance" class="form-control"/>
+        <label asp-for="InputDistance">Distance</label>
       </div>
     </fieldset>
     <fieldset>
@@ -40,7 +40,7 @@
         <label asp-for="TotalHours">HH</label>
       </div>
       <div>
-        <input asp-for="TotalMinutes" class="form-contorl" />
+        <input asp-for="TotalMinutes" class="form-control" />
         <label asp-for="TotalMinutes">MM</label>
       </div>
       <div>
@@ -63,20 +63,16 @@
           <label for="meters">meters</label>
       </div>
       <div>
-          <input type="radio" id="meters" name="Unit" value="meters" />
-          <label for="meters">meters</label>
-      </div>
-      <div>
           <input type="radio" id="feet" name="Unit" value="feet" />
           <label for="feet">feet</label>
       </div>
     </fieldset>
-    <button type="submit" class="btn btn-primary">Calculate</button>
+    <button type="submit" formmethod="post" class="btn btn-primary">Calculate</button>
   </form>
         <div>
           <form method="post">
             <div>
-              <label asp-for="UserInput.GpxFile">Upload GPX File</label>
+              <label asp-for="GpxFile">Upload GPX File</label>
               <input type="file" name="GpxFile">
           </div>
       </form>

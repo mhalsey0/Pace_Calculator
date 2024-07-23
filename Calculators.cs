@@ -4,15 +4,15 @@ namespace Pace_Calculator
     {
         public static void Calculate(UserInput userInput)
         {
-            if(userInput.Pace == null)
+            if(userInput.Pace == TimeSpan.FromHours(0))
             {
                 userInput.Pace = PaceCalculator((TimeSpan)userInput.TotalTime, (double)userInput.Distance);
             }
-            if(userInput.Distance == null)
+            if(userInput.Distance == 0)
             {
                 userInput.Distance = DistanceCalculator((TimeSpan)userInput.TotalTime, (TimeSpan)userInput.Pace);
             }
-            if (userInput.TotalTime == null)
+            if (userInput.TotalTime == TimeSpan.FromHours(0))
             {
                 userInput.TotalTime = TotalTimeCalculator((TimeSpan)userInput.Pace, (double)userInput.Distance);
             }
