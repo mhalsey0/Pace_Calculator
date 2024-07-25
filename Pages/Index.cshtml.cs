@@ -25,6 +25,8 @@ namespace Pace_Calculator.Pages
         public required string Unit { get; set; }
         [BindProperty]
         public string? GpxFile { get; set; }
+        public List<PaceChart> paceCharts { get; set; }
+
 
 
 /*        private readonly ILogger<IndexModel> _logger;
@@ -38,8 +40,9 @@ namespace Pace_Calculator.Pages
         {
 
         }
-        public void OnPost()
+        public IActionResult OnPost()
         {
+            ModelState.Clear();
             UserInput userInput = new()
             {
                 Pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds),
@@ -48,10 +51,20 @@ namespace Pace_Calculator.Pages
                 Unit = Unit
             };
             Calculators.Calculate(userInput);
-            //InputDistance = (double)userInput.Distance;
 
-            Console.WriteLine($"{userInput.TotalTime},{userInput.Pace},{userInput.Distance}");
-            return;
+            PaceHours = userInput.Pace.Hours;
+            PaceMinutes = userInput.Pace.Minutes;
+            PaceSeconds = userInput.Pace.Seconds;
+            InputDistance = (double)userInput.Distance;
+            TotalHours = userInput.TotalTime.Hours;
+            TotalMinutes = userInput.TotalTime.Minutes;
+            TotalSeconds = userInput.TotalTime.Seconds;
+            
+            List<PaceChart> paceChart = new List<PaceChart>();
+            
+            paceCharts = Calculators.CalculatePaceChart(userInput);
+            
+            return Page();
         }
     }
 }

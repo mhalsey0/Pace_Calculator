@@ -69,12 +69,34 @@
     </fieldset>
     <button type="submit" formmethod="post" class="btn btn-primary">Calculate</button>
   </form>
-        <div>
-          <form method="post">
-            <div>
-              <label asp-for="GpxFile">Upload GPX File</label>
-              <input type="file" name="GpxFile">
-          </div>
-      </form>
-    </div>
+  <div>
+    <form method="post">
+      <div>
+        <label asp-for="GpxFile">Upload GPX File</label>
+        <input type="file" name="GpxFile">
+      </div>
+    </form>
+  </div>
+  @if(Model.paceCharts != null)
+  {
+  <div>
+    <table>
+      <tr>
+        <th>Mark</th><!--Will need to make this dynamic based on userInput.Unit-->
+        <th>Pace</th>
+        <th>Time</th>
+      </tr>
+      <tr>
+        @foreach(var p in Model.paceCharts)
+        {
+          <tr>
+            <td>@p.Distance</td>
+            <td>@p.Pace</td>
+            <td>@p.CummulativeTime</td>
+          </tr>
+        }
+      </tr>
+    </table>
+  </div>
+  }
 </body>
