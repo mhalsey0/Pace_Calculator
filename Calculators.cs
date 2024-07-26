@@ -70,5 +70,19 @@ namespace Pace_Calculator
                 return paceChartRows;
             }
         }
+        public static double CalculatePaceAdjustment(double grade)
+        {
+            //constants for polynomial equation for PaceAdjustment
+            double a4 = -533.33;
+            double a3 = 26.67;
+            double a2 = 25.33;
+            double a1 = 2.73;
+            double a0 = 1.0;
+            //variable for polynomial equation
+            double x = Math.Max(-0.1, Math.Min(grade, 0.1));
+
+            double PaceAdjustment = a4 * Math.Pow(x, 4) + a3 * Math.Pow(x, 3) + a2 * Math.Pow(x, 2) + a1 * x + a0;
+            return PaceAdjustment;
+        }
     }
 }
