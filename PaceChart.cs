@@ -1,3 +1,5 @@
+using RolandK.Formats.Gpx;
+
 namespace Pace_Calculator
 {
     public class PaceChart

@@ -29,13 +29,15 @@ namespace Pace_Calculator.Pages
 
 
 
-/*        private readonly ILogger<IndexModel> _logger;
+        private readonly ILogger<IndexModel> _logger;
+        private readonly IHostEnvironment _environment;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, IHostEnvironment environment)
         {
             _logger = logger;
+            _environment = environment;
         }
-*/
+
         public void OnGet()
         {
 
@@ -65,6 +67,21 @@ namespace Pace_Calculator.Pages
             paceCharts = Calculators.CalculatePaceChart(userInput);
 
             return Page();
+        }
+        public async Task OnPostGPXUploadAsync()
+        {
+            if (GpxFile == null || GpxFile.Length == 0)
+            {
+                return;
+            }
+ 
+            _logger.LogInformation($"Uploading {GpxFile.FileName}.");
+            string targetFileName = $"{_environment.ContentRootPath}/{GpxFile.FileName}";
+ 
+            using (var stream = new FileStream(targetFileName, FileMode.Create))
+            {
+                await GpxFile.CopyToAsync(stream);
+            }
         }
     }
 }
