@@ -70,6 +70,14 @@ namespace Pace_Calculator
                 return paceChartRows;
             }
         }
+        
+        public static TimeSpan GradeAdjustedPace(TimeSpan pace, double paceAdjustment)
+        {
+            TimeSpan gradeAdjustedPace = pace.Multiply(paceAdjustment);
+            
+            return gradeAdjustedPace;
+        }
+
         public static double CalculatePaceAdjustment(double grade)
         {
             //constants for polynomial equation for PaceAdjustment

@@ -7,4 +7,8 @@
     <RootNamespace>Pace_Calculator</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="RolandK.Formats.Gpx" Version="1.0.1" />
+  </ItemGroup>
+
 </Project>

@@ -23,8 +23,8 @@ namespace Pace_Calculator.Pages
         [BindProperty]
         [Required]
         public required string Unit { get; set; }
-        [BindProperty]
-        public string? GpxFile { get; set; }
+        [BindProperty, Display(Name = "Course")]
+        public IFormFile? GpxFile { get; set; }
         public List<PaceChart> paceCharts { get; set; }
 
 
@@ -55,7 +55,7 @@ namespace Pace_Calculator.Pages
             PaceHours = userInput.Pace.Hours;
             PaceMinutes = userInput.Pace.Minutes;
             PaceSeconds = userInput.Pace.Seconds;
-            InputDistance = (double)userInput.Distance;
+            InputDistance = userInput.Distance;
             TotalHours = userInput.TotalTime.Hours;
             TotalMinutes = userInput.TotalTime.Minutes;
             TotalSeconds = userInput.TotalTime.Seconds;
@@ -63,7 +63,7 @@ namespace Pace_Calculator.Pages
             List<PaceChart> paceChart = new List<PaceChart>();
             
             paceCharts = Calculators.CalculatePaceChart(userInput);
-            
+
             return Page();
         }
     }

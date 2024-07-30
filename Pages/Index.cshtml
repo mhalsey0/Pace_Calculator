@@ -71,9 +71,10 @@
   </form>
   <div>
     <form method="post">
-      <div>
-        <label asp-for="GpxFile">Upload GPX File</label>
-        <input type="file" name="GpxFile">
+      <div class="form-group">
+        <label asp-for="GpxFile" class="control-label">Upload GPX File</label>
+        <input asp-for="GpxFile" class="form-control" accept=".gpx"/>
+        <span class=></span>
       </div>
     </form>
   </div>
