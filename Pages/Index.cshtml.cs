@@ -52,7 +52,10 @@ namespace Pace_Calculator.Pages
                 TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
                 Unit = Unit
             };
-            Calculators.Calculate(userInput);
+
+            PreviousInput previousInput = PreviousInput.FromUserInput(userInput);
+
+            Calculators.Calculate(userInput, previousInput);
 
             PaceHours = userInput.Pace.Hours;
             PaceMinutes = userInput.Pace.Minutes;
@@ -65,6 +68,8 @@ namespace Pace_Calculator.Pages
             List<PaceChart> paceChart = new List<PaceChart>();
             
             paceCharts = Calculators.CalculatePaceChart(userInput);
+
+            
 
             return Page();
         }

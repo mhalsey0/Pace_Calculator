@@ -2,20 +2,21 @@ namespace Pace_Calculator
 {
     public class Calculators
     {
-        public static void Calculate(UserInput userInput)
+        public static void Calculate(UserInput userInput, PreviousInput previousInput)
         {
-            if(userInput.Pace == TimeSpan.FromHours(0))
+            if(userInput.Pace == TimeSpan.FromHours(0) || userInput.Pace != previousInput.Pace)
             {
                 userInput.Pace = PaceCalculator((TimeSpan)userInput.TotalTime, (double)userInput.Distance);
             }
-            if(userInput.Distance == 0)
+            if(userInput.Distance == 0 || userInput.Distance != previousInput.Distance)
             {
                 userInput.Distance = DistanceCalculator((TimeSpan)userInput.TotalTime, (TimeSpan)userInput.Pace);
             }
-            if (userInput.TotalTime == TimeSpan.FromHours(0))
+            if (userInput.TotalTime == TimeSpan.FromHours(0) || userInput.TotalTime != previousInput.TotalTime)
             {
                 userInput.TotalTime = TotalTimeCalculator((TimeSpan)userInput.Pace, (double)userInput.Distance);
             }
+
             return;
         }
         //Will need to account for units in formatting for display
