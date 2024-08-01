@@ -27,8 +27,6 @@ namespace Pace_Calculator.Pages
         public IFormFile? GpxFile { get; set; }
         public List<PaceChart> paceCharts { get; set; }
 
-
-
         private readonly ILogger<IndexModel> _logger;
         private readonly IHostEnvironment _environment;
 
@@ -53,9 +51,26 @@ namespace Pace_Calculator.Pages
                 Unit = Unit
             };
 
+            
+
+            PreviousInput previousInput = PreviousInput.FromUserInput(userInput);
+            PreviousInput previousInputStored = previousInput;
             PreviousInput previousInput = PreviousInput.FromUserInput(userInput);
 
-            Calculators.Calculate(userInput, previousInput);
+            if( userInput.Pace == previousInputStored.Pace
+                &&
+                userInput.Distance == previousInputStored.Distance
+                &&
+                userInput.TotalTime == previousInputStored.TotalTime)
+                {
+                    Calculators.Calculate(userInput, previousInput);
+                } 
+                else
+                {
+                Calculators.Calculate(userInput, previousInputStored);
+                };
+            
+            
 
             PaceHours = userInput.Pace.Hours;
             PaceMinutes = userInput.Pace.Minutes;
