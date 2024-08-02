@@ -22,17 +22,17 @@ namespace Pace_Calculator
                 
                 if (propertyValue.Equals(0))
                 {
-                    if (property.PropertyType == typeof(TimeSpan) && property.Name == "Pace") // Type-safe comparison
+                    if (property.PropertyType == typeof(TimeSpan) && property.Name == "Pace") 
                     {
                         userInput.Pace = PaceCalculator(userInput.TotalTime, userInput.Distance);
                         needsCalculation = false;
                     }
-                    if (property.PropertyType == typeof(double) && property.Name == "Distance") // Type-safe comparison
+                    if (property.PropertyType == typeof(double) && property.Name == "Distance") 
                     {
                         userInput.Distance = DistanceCalculator(userInput.TotalTime, userInput.Pace);
                         needsCalculation = false;
                     }
-                    if (property.PropertyType == typeof(TimeSpan) && property.Name == "TotalTime") // Type-safe comparison
+                    if (property.PropertyType == typeof(TimeSpan) && property.Name == "TotalTime") 
                     {
                         userInput.TotalTime = TotalTimeCalculator(userInput.Pace, userInput.Distance);
                         needsCalculation = false;
@@ -49,20 +49,20 @@ namespace Pace_Calculator
         public static void toCalculate(UserInput userInput)
         {
             TimeSpan pace = PaceCalculator(userInput.TotalTime, userInput.Distance);
-            double distance = DistanceCalculator(userInput.TotalTime, userInput.Pace); // Corrected type to double
+            double distance = DistanceCalculator(userInput.TotalTime, userInput.Pace);
             TimeSpan totalTime = TotalTimeCalculator(userInput.Pace, userInput.Distance);
 
-            if (userInput.Pace != pace)
-            {
-                userInput.TotalTime = totalTime;
-            }
-            if (userInput.Distance != distance)
-            {
-                userInput.TotalTime = totalTime;
-            }
-            if (userInput.TotalTime != totalTime)
+            if (userInput.Pace != pace && userInput.Distance != distance)
             {
                 userInput.Pace = pace;
+            }
+            if (userInput.Distance != distance && userInput.TotalTime != totalTime)
+            {
+                userInput.TotalTime = totalTime;
+            }
+            if (userInput.TotalTime != totalTime && userInput.Pace != pace)
+            {
+                userInput.TotalTime = totalTime;
             }
         }
 

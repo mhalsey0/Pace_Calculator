@@ -64,7 +64,7 @@ namespace Pace_Calculator.Pages
             
             paceCharts = Calculators.CalculatePaceChart(userInput);
 
-            
+            Console.WriteLine(userInput.Pace.ToString(), userInput.Distance.ToString(), userInput.TotalTime.ToString());
 
             return Page();
         }
