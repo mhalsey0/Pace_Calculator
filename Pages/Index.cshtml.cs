@@ -7,8 +7,6 @@ namespace Pace_Calculator.Pages
     public class IndexModel : PageModel
     {
         [BindProperty]
-        public int PaceHours { get; set; }
-        [BindProperty]
         public int PaceMinutes { get; set; }
         [BindProperty]
         public int PaceSeconds { get; set; }
@@ -45,34 +43,16 @@ namespace Pace_Calculator.Pages
             ModelState.Clear();
             UserInput userInput = new()
             {
-                Pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds),
+                Pace = new TimeSpan( 0,PaceMinutes, PaceSeconds),
                 Distance = InputDistance,
                 TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
                 Unit = Unit
             };
 
-            
 
-            PreviousInput previousInput = PreviousInput.FromUserInput(userInput);
-            PreviousInput previousInputStored = previousInput;
-            PreviousInput previousInput = PreviousInput.FromUserInput(userInput);
-
-            if( userInput.Pace == previousInputStored.Pace
-                &&
-                userInput.Distance == previousInputStored.Distance
-                &&
-                userInput.TotalTime == previousInputStored.TotalTime)
-                {
-                    Calculators.Calculate(userInput, previousInput);
-                } 
-                else
-                {
-                Calculators.Calculate(userInput, previousInputStored);
-                };
+                Calculators.Calculate(userInput);
             
             
-
-            PaceHours = userInput.Pace.Hours;
             PaceMinutes = userInput.Pace.Minutes;
             PaceSeconds = userInput.Pace.Seconds;
             InputDistance = userInput.Distance;
