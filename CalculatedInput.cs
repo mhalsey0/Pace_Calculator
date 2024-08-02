@@ -1,26 +1,22 @@
 namespace Pace_Calculator
 {
-    public class PreviousInput
+    public class CalculatedInput
     {
         public TimeSpan Pace { get; set; } = TimeSpan.FromSeconds(0);
         public double Distance { get; set; } = 0;
         public TimeSpan TotalTime{ get; set; } = TimeSpan.FromSeconds(0);
-        public required string Unit { get; set; } = "";
-        public string? GpxFile { get; set; } = null;
 
 
-        public PreviousInput()
+        public CalculatedInput()
         {
             
         }
 
-        public static PreviousInput FromUserInput(UserInput userInput) => new PreviousInput
+        public static CalculatedInput FromUserInput(UserInput userInput) => new()
         {
             Pace = userInput.Pace,
             Distance = userInput.Distance,
             TotalTime = userInput.TotalTime,
-            Unit = userInput.Unit,
-            GpxFile = userInput.GpxFile
         };
     }
 }

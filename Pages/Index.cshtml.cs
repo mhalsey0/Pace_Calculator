@@ -48,17 +48,22 @@ namespace Pace_Calculator.Pages
                 TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
                 Unit = Unit
             };
+            CalculatedInput calculatedInput = new()
+            {
+                Pace = new TimeSpan(0,0,0),
+                Distance = 0,
+                TotalTime = new TimeSpan(0,0,0)
+            };
 
-
-                Calculators.Calculate(userInput);
+            Calculators.Calculate(userInput, calculatedInput);
             
             
-            PaceMinutes = userInput.Pace.Minutes;
-            PaceSeconds = userInput.Pace.Seconds;
-            InputDistance = userInput.Distance;
-            TotalHours = userInput.TotalTime.Hours;
-            TotalMinutes = userInput.TotalTime.Minutes;
-            TotalSeconds = userInput.TotalTime.Seconds;
+            PaceMinutes = calculatedInput.Pace.Minutes;
+            PaceSeconds = calculatedInput.Pace.Seconds;
+            InputDistance = calculatedInput.Distance;
+            TotalHours = calculatedInput.TotalTime.Hours;
+            TotalMinutes = calculatedInput.TotalTime.Minutes;
+            TotalSeconds = calculatedInput.TotalTime.Seconds;
             
             List<PaceChart> paceChart = new List<PaceChart>();
             

@@ -6,7 +6,7 @@ namespace Pace_Calculator
 {
     public class Calculators
     {
-        public static void Calculate(UserInput userInput)
+        public static void Calculate(UserInput userInput, CalculatedInput calculatedInput)
         {
             PropertyInfo[] userInputProperties = userInput.GetType().GetProperties();
             bool needsCalculation = true;
@@ -24,17 +24,23 @@ namespace Pace_Calculator
                 {
                     if (property.PropertyType == typeof(TimeSpan) && property.Name == "Pace") 
                     {
-                        userInput.Pace = PaceCalculator(userInput.TotalTime, userInput.Distance);
+                        calculatedInput.Pace = PaceCalculator(userInput.TotalTime, userInput.Distance);
+                        calculatedInput.Distance = userInput.Distance;
+                        calculatedInput.TotalTime = userInput.TotalTime;
                         needsCalculation = false;
                     }
                     if (property.PropertyType == typeof(double) && property.Name == "Distance") 
                     {
-                        userInput.Distance = DistanceCalculator(userInput.TotalTime, userInput.Pace);
+                        calculatedInput.Distance = DistanceCalculator(userInput.TotalTime, userInput.Pace);
+                        calculatedInput.TotalTime = userInput.TotalTime;
+                        calculatedInput.Pace = userInput.Pace;
                         needsCalculation = false;
                     }
                     if (property.PropertyType == typeof(TimeSpan) && property.Name == "TotalTime") 
                     {
-                        userInput.TotalTime = TotalTimeCalculator(userInput.Pace, userInput.Distance);
+                        calculatedInput.TotalTime = TotalTimeCalculator(userInput.Pace, userInput.Distance);
+                        calculatedInput.Pace = userInput.Pace;
+                        calculatedInput.Distance = userInput.Distance;
                         needsCalculation = false;
                     }
                 }
@@ -42,11 +48,11 @@ namespace Pace_Calculator
 
             if (needsCalculation)
             {
-                toCalculate(userInput);
+                toCalculate(userInput, calculatedInput);
             }
         }
 
-        public static void toCalculate(UserInput userInput)
+        public static void toCalculate(UserInput userInput, CalculatedInput calculatedInput)
         {
             TimeSpan pace = PaceCalculator(userInput.TotalTime, userInput.Distance);
             double distance = DistanceCalculator(userInput.TotalTime, userInput.Pace);
@@ -54,15 +60,21 @@ namespace Pace_Calculator
 
             if (userInput.Pace != pace && userInput.Distance != distance)
             {
-                userInput.Pace = pace;
+                calculatedInput.Pace = pace;
+                calculatedInput.Distance = userInput.Distance;
+                calculatedInput.TotalTime = userInput.TotalTime;                
             }
             if (userInput.Distance != distance && userInput.TotalTime != totalTime)
             {
-                userInput.TotalTime = totalTime;
+                calculatedInput.TotalTime = totalTime;
+                calculatedInput.Pace = userInput.Pace;
+                calculatedInput.Distance = userInput.Distance;
             }
             if (userInput.TotalTime != totalTime && userInput.Pace != pace)
             {
-                userInput.TotalTime = totalTime;
+                calculatedInput.TotalTime = totalTime;
+                calculatedInput.Pace = userInput.Pace;
+                calculatedInput.Distance = userInput.Distance;
             }
         }
 
