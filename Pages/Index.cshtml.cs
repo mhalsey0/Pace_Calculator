@@ -42,8 +42,12 @@ namespace Pace_Calculator.Pages
         {
 
         }
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }            
             ModelState.Clear();
             UserInput userInput = new()
             {
@@ -66,9 +70,11 @@ namespace Pace_Calculator.Pages
             
             paceCharts = Calculators.CalculatePaceChart(userInput);
 
+            await GPXUploadAsync();
+
             return Page();
         }
-        public async Task OnPostGPXUploadAsync()
+        public async Task GPXUploadAsync()
         {
             if (GpxFile == null || GpxFile.Length == 0)
             {

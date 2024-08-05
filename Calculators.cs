@@ -1,3 +1,5 @@
+using RolandK.Formats.Gpx;
+
 namespace Pace_Calculator
 {
     public class Calculators
@@ -25,6 +27,7 @@ namespace Pace_Calculator
             }
             return;
         }
+        
         //Will need to account for units in formatting for display
         public static TimeSpan PaceCalculator(TimeSpan totalTime, double distance)
         {
