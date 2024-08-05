@@ -4,28 +4,43 @@ namespace Pace_Calculator
     {
         public static void Calculate(UserInput userInput)
         {
-            if(userInput.Pace == TimeSpan.FromHours(0))
+            TimeSpan pace = PaceCalculator((TimeSpan)userInput.TotalTime, (double)userInput.Distance);
+            Double distance = DistanceCalculator((TimeSpan)userInput.TotalTime, (TimeSpan)userInput.Pace);
+            TimeSpan totalTime = TotalTimeCalculator((TimeSpan)userInput.Pace, (double)userInput.Distance);
+
+            if (userInput.Pace != pace && userInput.Distance != distance)
             {
-                userInput.Pace = PaceCalculator((TimeSpan)userInput.TotalTime, (double)userInput.Distance);
+                userInput.Pace = pace;
+                return;
             }
-            if(userInput.Distance == 0)
+            if (userInput.Distance != distance && userInput.TotalTime != totalTime)
             {
-                userInput.Distance = DistanceCalculator((TimeSpan)userInput.TotalTime, (TimeSpan)userInput.Pace);
+                userInput.TotalTime = totalTime;
+                return;
             }
-            if (userInput.TotalTime == TimeSpan.FromHours(0))
+            if (userInput.TotalTime != totalTime && userInput.Pace != pace)
             {
-                userInput.TotalTime = TotalTimeCalculator((TimeSpan)userInput.Pace, (double)userInput.Distance);
+                userInput.Distance = distance;
+                return;
             }
             return;
         }
         //Will need to account for units in formatting for display
         public static TimeSpan PaceCalculator(TimeSpan totalTime, double distance)
         {
+            if (distance == 0)
+            {
+                return TimeSpan.Zero;
+            }
             TimeSpan pace = totalTime / distance;
             return pace; //pace is equal to total time divided by total distance
         }
         public static double DistanceCalculator(TimeSpan totalTime, TimeSpan pace)
         {        
+            if (pace == TimeSpan.Zero)
+            {
+                return 0;
+            }
             double distance = totalTime / pace; 
             return distance; //distance is equal to total time divided  by pace
         }
