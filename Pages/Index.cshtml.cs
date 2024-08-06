@@ -56,6 +56,7 @@ namespace Pace_Calculator.Pages
                 TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
                 Unit = Unit
             };
+
             Calculators.Calculate(userInput);
 
             PaceHours = userInput.Pace.Hours;
