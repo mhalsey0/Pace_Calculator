@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using RolandK.Formats.Gpx;
 
 namespace Pace_Calculator.Pages
 {
@@ -22,17 +23,17 @@ namespace Pace_Calculator.Pages
         public int TotalSeconds { get; set; }
         [BindProperty]
         [Required]
-        public required string Unit { get; set; }
-        [BindProperty, Display(Name = "Course")]
-        public IFormFile? GpxFile { get; set; }
-        public List<PaceChart> paceCharts { get; set; }
+        public UnitOfLength Unit { get; set; }
+        [BindProperty]
+        public IFormFile? GpxFileFromUser { get; set; }
+        public List<PaceChart> PaceCharts { get; set; }
 
 
 
         private readonly ILogger<IndexModel> _logger;
-        private readonly IHostEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
 
-        public IndexModel(ILogger<IndexModel> logger, IHostEnvironment environment)
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;
@@ -48,46 +49,79 @@ namespace Pace_Calculator.Pages
         {
             return Page();
         }            
-            ModelState.Clear();
-            UserInput userInput = new()
-            {
-                Pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds),
-                Distance = InputDistance,
-                TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
-                Unit = Unit
-            };
+        ModelState.Clear();
 
-            Calculators.Calculate(userInput);
-
-            PaceHours = userInput.Pace.Hours;
-            PaceMinutes = userInput.Pace.Minutes;
-            PaceSeconds = userInput.Pace.Seconds;
-            InputDistance = userInput.Distance;
-            TotalHours = userInput.TotalTime.Hours;
-            TotalMinutes = userInput.TotalTime.Minutes;
-            TotalSeconds = userInput.TotalTime.Seconds;
-            
-            List<PaceChart> paceChart = new List<PaceChart>();
-            
-            paceCharts = Calculators.CalculatePaceChart(userInput);
-
-            await GPXUploadAsync();
-
-            return Page();
-        }
-        public async Task GPXUploadAsync()
+        await GPXUploadAsync();
+        
+        UserInput userInput = new()
         {
-            if (GpxFile == null || GpxFile.Length == 0)
+            Pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds),
+            Distance = InputDistance,
+            TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
+            Unit = Unit,
+            GpxFileFromUser = GpxFileFromUser
+        };
+
+        if (userInput.GpxFileFromUser != null && userInput.TotalTime > TimeSpan.Zero)
+        {
+            var cleanFileName = Path.GetFileNameWithoutExtension(GpxFileFromUser.FileName);
+            var fileExtension = Path.GetExtension(GpxFileFromUser.FileName);
+            var safeFileName = $"{cleanFileName}_{Guid.NewGuid()}{fileExtension}";
+            var uploadPath = Path.Combine(_environment.WebRootPath, "FileUpload");
+            var gpxFile = await GpxFile.LoadAsync(uploadPath);
+
+
+            
+            System.Console.WriteLine($"Your file name is {safeFileName} and the path is {uploadPath}");
+        }
+
+        CalculatedInput calculatedInput = Calculators.Calculate(userInput);
+
+        PaceHours = calculatedInput.Pace.Hours;
+        PaceMinutes = calculatedInput.Pace.Minutes;
+        PaceSeconds = calculatedInput.Pace.Seconds;
+        InputDistance = calculatedInput.Distance;
+        TotalHours = calculatedInput.TotalTime.Hours;
+        TotalMinutes = calculatedInput.TotalTime.Minutes;
+        TotalSeconds = calculatedInput.TotalTime.Seconds;
+        
+        PaceCharts = Calculators.CalculatePaceChart(calculatedInput);
+
+        return Page();
+        }
+        private async Task GPXUploadAsync()
+        {
+            if (GpxFileFromUser == null || GpxFileFromUser.Length == 0)
             {
                 return;
             }
- 
-            _logger.LogInformation($"Uploading {GpxFile.FileName}.");
-            string targetFileName = $"{_environment.ContentRootPath}/{GpxFile.FileName}";
- 
-            using (var stream = new FileStream(targetFileName, FileMode.Create))
+
+            try
             {
-                await GpxFile.CopyToAsync(stream);
+                _logger.LogInformation($"Uploading {GpxFileFromUser.FileName}.");
+                
+                var cleanFileName = Path.GetFileNameWithoutExtension(GpxFileFromUser.FileName);
+                var fileExtension = Path.GetExtension(GpxFileFromUser.FileName);
+                var safeFileName = $"{cleanFileName}_{Guid.NewGuid()}{fileExtension}";
+                
+                var uploadPath = Path.Combine(_environment.WebRootPath, "FileUpload");
+                if (!Directory.Exists(uploadPath))
+                {
+                    Directory.CreateDirectory(uploadPath);
+                }
+
+                var filePath = Path.Combine(uploadPath, safeFileName);
+                
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await GpxFileFromUser.CopyToAsync(stream);
+                }
+
+                _logger.LogInformation($"File uploaded successfully to {filePath}.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while uploading the file.");
             }
         }
     }

@@ -40,7 +40,7 @@
                             </div>
                             <div id="question2" class="question" style="display:none;">
                                 <label>Please upload your file:</label><br />
-                                <input asp-for="GpxFile" type="file" class="form-control-file" /><br />
+                                <input asp-for="GpxFileFromUser" type="file" class="form-control-file" /><br />
                                 <button type="button" class="btn btn-primary" onclick="showQuestion(5)">Next</button>
                             </div>
                             <div id="question3" class="question" style="display:none;">
@@ -52,12 +52,12 @@
                                 <label>Please enter the distance:</label><br />
                                 <input asp-for="InputDistance" type="number" step="0.01" class="form-control" /><br />
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="DistanceUnit" value="miles" id="miles" checked>
-                                    <label class="form-check-label" for="miles">Miles</label>
+                                    <input class="form-check-input" type="radio" name="Unit" value="miles" id="miles" checked>
+                                    <label class="form-check-label" for="Miles">Miles</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="InputUnit" value="kilometers" id="kilometers">
-                                    <label class="form-check-label" for="kilometers">Kilometers</label>
+                                    <input class="form-check-input" type="radio" name="Unit" value="kilometers" id="kilometers">
+                                    <label class="form-check-label" for="Kilometers">Kilometers</label>
                                 </div><br />
                                 <button type="button" class="btn btn-primary" onclick="showQuestion(5)">Next</button>
                             </div>
@@ -89,7 +89,7 @@
                             </div>                            
                             <div id="question9" class="question" style="display:none;">
                                 <label>Summary:</label><br />
-                                <p id="summary"></p>
+                                <p id="IndexModel"></p>
                                 <button type="submit" class="btn btn-success">Submit</button>
                             </div>
                         </form>
@@ -98,7 +98,7 @@
             </div>
         </div>
     </div>
-    @if(Model.paceCharts != null)
+    @if(Model.PaceCharts != null)
   {
   <div>
     <table>
@@ -108,7 +108,7 @@
         <th>Time</th>
       </tr>
       <tr>
-        @foreach(var p in Model.paceCharts)
+        @foreach(var p in Model.PaceCharts)
         {
           <tr>
             <td>@p.Distance</td>
@@ -119,6 +119,53 @@
       </tr>
     </table>
   </div>
+  <form method="post">
+    <fieldset>
+      <legend>Pace</legend>
+      <div>
+        <input asp-for="PaceMinutes" class="form-control" />
+        <label asp-for="PaceMinutes">MM</label>
+      </div>
+      <div>
+        <input asp-for="PaceSeconds" class="form-control"/>
+        <label asp-for="PaceSeconds">SS</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Distance</legend>
+      <div>
+        <input asp-for="InputDistance" class="form-control"/>
+        <label asp-for="InputDistance">Distance</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Total Time</legend>
+      <div>
+        <input asp-for="TotalHours" class="form-control" />
+        <label asp-for="TotalHours">HH</label>
+      </div>
+      <div>
+        <input asp-for="TotalMinutes" class="form-control" />
+        <label asp-for="TotalMinutes">MM</label>
+      </div>
+      <div>
+        <input asp-for="TotalSeconds" class="form-control"/>
+        <label asp-for="TotalSeconds">SS</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Select your unit of distance</legend>
+      <div>
+          <input type="radio" id="km" name="Unit" value="km" checked />
+          <label for="km">km</label>
+      </div>
+      <div>
+          <input type="radio" id="miles" name="Unit" value="miles" />
+          <label for="miles">miles</label>
+      </div>
+    </fieldset>
+  </form>
+
   }
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>

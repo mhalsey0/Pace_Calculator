@@ -4,28 +4,33 @@ namespace Pace_Calculator
 {
     public class Calculators
     {
-        public static void Calculate(UserInput userInput)
+        public static CalculatedInput Calculate(UserInput userInput)
         {
-            TimeSpan pace = PaceCalculator((TimeSpan)userInput.TotalTime, (double)userInput.Distance);
-            Double distance = DistanceCalculator((TimeSpan)userInput.TotalTime, (TimeSpan)userInput.Pace);
-            TimeSpan totalTime = TotalTimeCalculator((TimeSpan)userInput.Pace, (double)userInput.Distance);
-
-            if (userInput.Pace != pace && userInput.Distance != distance)
+            if (userInput.Pace <= TimeSpan.Zero)
             {
-                userInput.Pace = pace;
-                return;
+                var pace = PaceCalculator(userInput.TotalTime, userInput.Distance);
+                return new CalculatedInput() {  Distance = userInput.Distance, 
+                                                TotalTime = userInput.TotalTime, 
+                                                Pace = pace,
+                                                Unit = userInput.Unit};
             }
-            if (userInput.Distance != distance && userInput.TotalTime != totalTime)
+            if (userInput.Distance <= 0)
             {
-                userInput.TotalTime = totalTime;
-                return;
+                var distance = DistanceCalculator(userInput.TotalTime, userInput.Pace);
+                return new CalculatedInput() {  Distance = distance, 
+                                                TotalTime = userInput.TotalTime, 
+                                                Pace = userInput.Pace,
+                                                Unit = userInput.Unit};
             }
-            if (userInput.TotalTime != totalTime && userInput.Pace != pace)
+            if (userInput.TotalTime <= TimeSpan.Zero)
             {
-                userInput.Distance = distance;
-                return;
+                var totalTime = TotalTimeCalculator(userInput.Pace, userInput.Distance);
+                return new CalculatedInput() {  Distance = userInput.Distance, 
+                                                TotalTime = totalTime, 
+                                                Pace = userInput.Pace,
+                                                Unit = userInput.Unit};
             }
-            return;
+            return CalculatedInput.FromUserInput(userInput);
         }
         
         //Will need to account for units in formatting for display
@@ -53,37 +58,37 @@ namespace Pace_Calculator
             return totalTime; //total time is equal to pace multiplied by distance
         }
 
-        public static List<PaceChart> CalculatePaceChart(UserInput userInput)
+        public static List<PaceChart> CalculatePaceChart(CalculatedInput calculatedInput)
         {
             List<PaceChart> paceChartRows = new List<PaceChart>();
 
-            int markerMax = (int)Math.Ceiling((double)userInput.Distance);
+            int markerMax = (int)Math.Ceiling((double)calculatedInput.Distance);
 
-            if (userInput.Distance - Math.Floor((double)userInput.Distance) == 0)
+            if (calculatedInput.Distance - Math.Floor((double)calculatedInput.Distance) == 0)
             {
                 for(int mark = 0; mark <= markerMax; mark++)
                 {
                     int Marker = mark;
                     double Distance = mark;
-                    TimeSpan Pace = (TimeSpan)userInput.Pace;
-                    TimeSpan CummulativeTime = (TimeSpan)userInput.Pace * mark;
+                    TimeSpan Pace = (TimeSpan)calculatedInput.Pace;
+                    TimeSpan CummulativeTime = (TimeSpan)calculatedInput.Pace * mark;
                     paceChartRows.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));                
                 }
                 return paceChartRows;
             } else
             {
-                for(int mark = 0; mark <= markerMax-1; mark++)
+                for(int mark = 1; mark <= markerMax-1; mark++)
                 {
                     int Marker = mark;
                     double Distance = mark;
-                    TimeSpan Pace = (TimeSpan)userInput.Pace;
-                    TimeSpan CummulativeTime = (TimeSpan)userInput.Pace * mark;
+                    TimeSpan Pace = (TimeSpan)calculatedInput.Pace;
+                    TimeSpan CummulativeTime = (TimeSpan)calculatedInput.Pace * mark;
                     paceChartRows.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));                
                 }
                 int FinalMarker = paceChartRows.Count;
-                double FinalDistance = (double)userInput.Distance - Math.Floor((double)userInput.Distance);
-                TimeSpan FinalPace = (TimeSpan) userInput.Pace;
-                TimeSpan FinalCummulativeTime = (TimeSpan)userInput.TotalTime;
+                double FinalDistance = Math.Round((double)calculatedInput.Distance - Math.Floor((double)calculatedInput.Distance),2);
+                TimeSpan FinalPace = (TimeSpan) calculatedInput.Pace;
+                TimeSpan FinalCummulativeTime = (TimeSpan)calculatedInput.TotalTime;
                 paceChartRows.Add(new PaceChart(FinalMarker, FinalDistance, FinalPace, FinalCummulativeTime));
                 return paceChartRows;
             }
