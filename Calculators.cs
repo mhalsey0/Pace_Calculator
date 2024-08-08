@@ -1,5 +1,6 @@
 using RolandK.Formats.Gpx;
 
+
 namespace Pace_Calculator
 {
     public class Calculators
@@ -93,6 +94,115 @@ namespace Pace_Calculator
                 return paceChartRows;
             }
         }
+
+        public static List<PaceChart> CalculateGradeAdjustedPaceChart(GpxFile gpxFile, CalculatedInput calculatedInput)
+        {
+            List<GpxInterval> gpxIntervals = FindIntervalsFromGpxFile(gpxFile);
+            List<PaceChart> gradeAdjustedPaceChart = new List<PaceChart>();
+            double totalDistance = Math.Round(GetTotalDistanceFromGpxFile(gpxFile, calculatedInput),2);
+            double markerMax = Math.Ceiling(totalDistance);
+
+            if( totalDistance - Math.Floor(totalDistance) == 0)
+            {
+                for (int mark = 0; mark <= markerMax;)
+                {
+                    int Marker = mark+1;
+                    double Distance = mark+1;
+                    double grade = gpxIntervals[mark].Grade;
+                    TimeSpan Pace = GradeAdjustedPace(calculatedInput.Pace,CalculatePaceAdjustment(grade));
+                    TimeSpan CummulativeTime = (TimeSpan)Pace * mark;
+                    gradeAdjustedPaceChart.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));                
+                }
+                return gradeAdjustedPaceChart;
+            }else
+            {
+                for (int mark = 0; mark <= markerMax;)
+                {
+                    int Marker = mark+1;
+                    double Distance = mark+1;
+                    double grade = gpxIntervals[mark].Grade;
+                    TimeSpan Pace = GradeAdjustedPace(calculatedInput.Pace,CalculatePaceAdjustment(grade));
+                    TimeSpan CummulativeTime = Pace * mark;
+                    gradeAdjustedPaceChart.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));                
+                }
+                int FinalMarker = gradeAdjustedPaceChart.Count;
+                double FinalDistance = Math.Round((double)calculatedInput.Distance - Math.Floor((double)calculatedInput.Distance),2);
+                TimeSpan FinalPace = PaceCalculator(calculatedInput.TotalTime, totalDistance);
+                TimeSpan FinalCummulativeTime = (TimeSpan)calculatedInput.TotalTime;
+                gradeAdjustedPaceChart.Add(new PaceChart(FinalMarker, FinalDistance, FinalPace, FinalCummulativeTime));
+                return gradeAdjustedPaceChart;                 
+            }
+        }
+        public static List<GpxInterval> FindIntervalsFromGpxFile(GpxFile gpxFile)
+        {
+            List<GpxInterval> gpxIntervals = new List<GpxInterval>();
+            List<double> elevation = GetElevationPoints(gpxFile);
+            List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
+            int countOfPoints = gpxFile.Waypoints.Count;
+
+            if(countOfPoints != coordinates.Count || countOfPoints != elevation.Count)
+            {
+                System.Console.WriteLine("waypoints does not equal the count of coordinates or count of elevation points");
+                return null;
+            }
+
+            for (int i = 0; i < countOfPoints;)
+            {
+                Coordinates start = coordinates[i];
+                Coordinates end = coordinates[i + 1];
+                double startElevation = elevation[i];
+                double endElevation = elevation[i + 1];
+                double distanceBetweenPoints = CoordinatesDistanceExtensions.DistanceTo(start, end);
+                double grade = GetGradeFromCoordinatesWithElevation(start, end, startElevation, endElevation);
+                gpxIntervals.Add(new GpxInterval(start, end, distanceBetweenPoints, grade));
+            }
+            return gpxIntervals;
+        }
+
+        // public static List<PaceChart> CalculateGradeAdjustedPaceChart(GpxFile gpxFile, CalculatedInput calculatedInput)
+        // {
+        //     List<PaceChart> paceChartRows = new List<PaceChart>();
+        //     List<TimeSpan> adjustedPaces = new List<TimeSpan>();
+        //     List<double> distanceBetweenPoints = GetDistanceBetweenPointsFromGpxFile(gpxFile, calculatedInput);
+        //     List<double> gradeBetweenPoints = GetGradeBetweenPoints(gpxFile, calculatedInput);
+        //     List<int> markers = GetMarkersFromGpxFile(gpxFile, calculatedInput);
+        //     List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
+        //     Coordinates start = coordinates[0];
+        //     Coordinates end = coordinates[^1];
+
+        //     foreach (double grade in gradeBetweenPoints)
+        //     {
+        //         adjustedPaces.Add(GradeAdjustedPace(calculatedInput.Pace, CalculatePaceAdjustment(grade)));
+        //     }
+
+        //     foreach (double distance in distanceBetweenPoints)
+        //     {
+        //         if (distance < 1)
+        //         {
+
+        //         }
+        //     }
+            
+        //     foreach (int marker in markers)
+        //     {
+        //         int Marker = marker;
+        //         double Distance = marker;
+        //         TimeSpan Pace = GradeAdjustedPace();
+        //         TimeSpan CummulativeTime = (TimeSpan)calculatedInput.Pace * marker;
+        //         paceChartRows.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));
+        //     }
+
+        //     int FinalMarker = paceChartRows.Count;
+        //     double FinalDistance = Math.Round(CoordinatesDistanceExtensions.DistanceTo(start,end,calculatedInput.Unit),2);
+        //     TimeSpan FinalPace = (TimeSpan) calculatedInput.Pace;
+        //     TimeSpan FinalCummulativeTime = (TimeSpan)calculatedInput.TotalTime;
+        //     paceChartRows.Add(new PaceChart(FinalMarker, FinalDistance, FinalPace, FinalCummulativeTime));
+        //     return paceChartRows;
+
+            
+
+
+        // }
         
         public static TimeSpan GradeAdjustedPace(TimeSpan pace, double paceAdjustment)
         {
@@ -114,6 +224,106 @@ namespace Pace_Calculator
 
             double PaceAdjustment = a4 * Math.Pow(x, 4) + a3 * Math.Pow(x, 3) + a2 * Math.Pow(x, 2) + a1 * x + a0;
             return PaceAdjustment;
+        }
+
+        public static List<Coordinates> CreateCoordinatesFromGpxFile(GpxFile gpxFile)
+        {
+            List<Coordinates> coordinates = new List<Coordinates>();
+
+            foreach (var point in gpxFile.Waypoints)
+            {
+                double longitude = point.Longitude;
+                double latitude = point.Latitude;
+                coordinates.Add(new Coordinates(longitude, latitude));
+            }
+            return coordinates;
+        }
+
+        public static List<double> GetDistanceBetweenPointsFromGpxFile(GpxFile gpxFile)
+        {
+            List<double> distanceBetweenPoints = new List<double>();
+            List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
+            int countOfPoints = gpxFile.Waypoints.Count;
+
+            for (int i = 0; i < countOfPoints;)
+            {
+                Coordinates start = coordinates[i];
+                Coordinates end = coordinates[i + 1];
+                distanceBetweenPoints.Add(CoordinatesDistanceExtensions.DistanceTo( start, end));
+            }
+
+            return distanceBetweenPoints;
+        }
+
+        public static List<double> GetElevationPoints(GpxFile gpxFile)
+        {
+            List<double> elevationPoints = new List<double>();
+
+            foreach (var point in gpxFile.Waypoints)
+            {
+                double elevation = (double)point.Elevation;
+                elevationPoints.Add(elevation);
+            }
+            return elevationPoints;
+        }
+
+        public static List<double> GetGradeBetweenPoints(GpxFile gpxFile, CalculatedInput calculatedInput)
+        {
+            List<double> grade = new List<double>();
+            List<double> distanceBetweenPoints = GetDistanceBetweenPointsFromGpxFile(gpxFile);
+            List<double> elevationPoints = GetElevationPoints(gpxFile);
+            elevationPoints.RemoveAt(elevationPoints.Count - 1);
+
+            for (int i = 0; i < elevationPoints.Count;)
+            {
+                if(distanceBetweenPoints[i] == 0)
+                {
+                    grade.Add(double.NaN);
+                }
+                grade.Add((elevationPoints[i] - elevationPoints[i +1])/ (distanceBetweenPoints [i] * 1000));
+            }
+            return grade;
+        }
+
+        public static double GetGradeFromCoordinatesWithElevation(Coordinates start, Coordinates end, double startElevation, double endElevation)
+        {
+            double distance = CoordinatesDistanceExtensions.DistanceTo(start, end);
+            double elevationChange = startElevation - endElevation;
+            if ( distance < 0)
+            {
+                return 0;
+            }
+            double grade = elevationChange / (distance * 1000);
+            
+            return grade;
+        }
+
+
+
+        public static List<int> GetMarkersFromGpxFile(GpxFile gpxFile, CalculatedInput calculatedInput)
+        {
+            List<int> markers = new List<int>();
+            UnitOfLength unitOfLength = calculatedInput.Unit;
+            List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
+            Coordinates start = coordinates[0];
+            Coordinates end = coordinates[^1];
+            double totalDistance = CoordinatesDistanceExtensions.DistanceTo(start, end, calculatedInput.Unit);
+
+            for (int mark = 0; mark < totalDistance+1;)
+            {
+                markers.Add(mark);
+            }
+
+            return markers;
+        }
+        public static double GetTotalDistanceFromGpxFile(GpxFile gpxFile, CalculatedInput calculatedInput)
+        {
+            List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
+            UnitOfLength unitOfLength = calculatedInput.Unit;
+            Coordinates start = coordinates [0];
+            Coordinates end = coordinates [^1];
+
+            return CoordinatesDistanceExtensions.DistanceTo(start, end, unitOfLength);
         }
     }
 }
