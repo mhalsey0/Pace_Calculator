@@ -17,4 +17,10 @@ the third. (e.g. total time and distance given will calculate the pace).
 ## How to Use
 
 1. Load application and click the "Start Creating your Pace Chart" button
-2. Upload your .gpx file (see 
+2. Upload your .gpx file (see either the TestGPXFiles folder in the project or this link https://drive.google.com/drive/folders/1awTf-Hhm6NjYGKtCfwnDPwZ6tbryPsCQ?usp=drive_link
+3. Enter the total time that you want to complete the course in the .gpx file
+4. Select your units of distance
+5. Submit
+
+If you don't have a total time you can simply select no and then enter the average pace you wish to hold.
+Also, if you do not upload a file you will be prompted to enter two variables.
