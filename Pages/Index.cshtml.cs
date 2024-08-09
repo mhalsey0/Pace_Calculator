@@ -8,7 +8,7 @@ namespace Pace_Calculator.Pages
 {
     public class IndexModel : PageModel
     {
-        [BindProperty, Description("Hours"),]
+        [BindProperty, Description("Hours")]
         public int PaceHours { get; set; }
         
         [BindProperty, Description("Minutes")]
@@ -17,7 +17,7 @@ namespace Pace_Calculator.Pages
         [BindProperty, Description("Seconds")]
         public int PaceSeconds { get; set; }
         
-        [BindProperty, Description("Distance"),Range(0.01, double.MaxValue, ErrorMessage = "Distance must be greater than 0.")]
+        [BindProperty, Description("Distance")]
         public double InputDistance { get; set; }
         
         [BindProperty, Description("Hours")]
