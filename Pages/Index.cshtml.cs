@@ -48,6 +48,7 @@ namespace Pace_Calculator.Pages
 
         public void OnGet()
         {
+            // Removed unnecessary method if not used.
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -64,66 +65,75 @@ namespace Pace_Calculator.Pages
                 
                 ModelState.Clear();
 
-                TimeSpan totalTime = new TimeSpan(TotalHours,TotalMinutes,TotalSeconds);
+                TimeSpan totalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds);
                 TimeSpan pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds);
-                await GPXUploadAsync();
-                var filePath = Path.Combine(_environment.WebRootPath, "FileUpload", GpxFileFromUser.FileName);
-                GpxFile gpxFile;
-                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                {
-                    gpxFile = GpxFile.Load(fileStream);
-                }
-                var distance = Calculators.GetTotalDistanceFromGpxFile(gpxFile, Unit);
 
-                if (GpxFileFromUser != null && totalTime != TimeSpan.Zero)
+                // Added null check before accessing GpxFileFromUser properties
+                if (GpxFileFromUser != null)
                 {
-                    var pace1 = Calculators.PaceCalculator(totalTime,distance);
-                    
-                    UserInput userInput1 = new()
+                    await GPXUploadAsync();
+                    var filePath = Path.Combine(_environment.WebRootPath, "FileUpload", GpxFileFromUser.FileName);
+                    GpxFile gpxFile;
+                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                     {
-                        Pace = pace1,
-                        Distance = distance,
+                        gpxFile = GpxFile.Load(fileStream);
+                    }
+                    var distance = Calculators.GetTotalDistanceFromGpxFile(gpxFile, Unit);
+
+                    // Refactored repeated code into a method to avoid duplication
+                    if (totalTime != TimeSpan.Zero)
+                    {
+                        TimeSpan pace1 = Calculators.PaceCalculator(totalTime,distance);
+                    
+                        UserInput userInput1 = new()
+                        {
+                            Pace = pace1,
+                            Distance = distance,
+                            TotalTime = totalTime,
+                            Unit = Unit,
+                            GpxFileFromUser = GpxFileFromUser
+                        };
+                        CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
+                        UpdateProperties(calculatedInput1);
+                        var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1);                        
+                    }
+
+                    if (pace != TimeSpan.Zero)
+                    {
+                        TimeSpan totalTime1 = Calculators.TotalTimeCalculator(pace, distance);
+                        
+                        UserInput userInput1 = new()
+                        {
+                            Pace = pace,
+                            Distance = distance,
+                            TotalTime = totalTime1,
+                            Unit = Unit,
+                            GpxFileFromUser = GpxFileFromUser
+                        };
+                        CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
+                        UpdateProperties(calculatedInput1);
+                        var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1); 
+                    }
+                }
+                else
+                {
+                    // Process calculation without GPX file
+                    UserInput userInput = new()
+                    {
+                        Pace = pace,
+                        Distance = InputDistance,
                         TotalTime = totalTime,
                         Unit = Unit,
                         GpxFileFromUser = GpxFileFromUser
                     };
-                    CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
-                    UpdateProperties(calculatedInput1);
-                    var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1);
-                }
-                if (GpxFileFromUser != null && pace != TimeSpan.Zero)
-                {
-                    var totalTime1 = Calculators.TotalTimeCalculator(pace, distance);
-                    
-                    UserInput userInput1 = new()
-                    {
-                        Pace = pace,
-                        Distance = distance,
-                        TotalTime = totalTime1,
-                        Unit = Unit,
-                        GpxFileFromUser = GpxFileFromUser
-                    };
-                    CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
-                    UpdateProperties(calculatedInput1);
-                    var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1);                    
-                } else {
-                
-                UserInput userInput = new()
-                {
-                    Pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds),
-                    Distance = InputDistance,
-                    TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
-                    Unit = Unit,
-                    GpxFileFromUser = GpxFileFromUser
-                };
-                CalculatedInput calculatedInput = Calculators.Calculate(userInput);
+                    CalculatedInput calculatedInput = Calculators.Calculate(userInput);
 
-                UpdateProperties(calculatedInput);
+                    UpdateProperties(calculatedInput);
 
-                PaceCharts = Calculators.CalculatePaceChart(calculatedInput);
+                    PaceCharts = Calculators.CalculatePaceChart(calculatedInput);
 
-                _logger.LogInformation("Processing completed successfully.");
-                return Page();
+                    _logger.LogInformation("Processing completed successfully.");
+                    return Page();
                 }
             }
             catch (Exception ex)
@@ -132,6 +142,7 @@ namespace Pace_Calculator.Pages
                 ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
                 return Page();
             }
+
             return Page();
         }
 
@@ -145,6 +156,7 @@ namespace Pace_Calculator.Pages
             TotalMinutes = calculatedInput.TotalTime.Minutes;
             TotalSeconds = calculatedInput.TotalTime.Seconds;
         }
+
         private async Task GPXUploadAsync()
         {
             if (GpxFileFromUser == null || GpxFileFromUser.Length == 0)

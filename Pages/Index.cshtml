@@ -125,27 +125,6 @@
       </tr>
     </table>
   </div>
-      @if(Model.gradeAdjustedPaceChart != null)
-  {
-  <div>
-    <table>
-      <tr>
-        <th>Mark</th><!--Will need to make this dynamic based on userInput.Unit-->
-        <th>Grade Adjusted Pace</th>
-        <th>Time</th>
-      </tr>
-      <tr>
-        @foreach(var p in Model.gradeAdjustedPaceChart)
-        {
-          <tr>
-            <td>@p.Distance</td>
-            <td>@p.Pace</td>
-            <td>@p.CummulativeTime</td>
-          </tr>
-        }
-      </tr>
-    </table>
-  </div>
   <form method="post">
     <fieldset>
       <legend>Pace</legend>
