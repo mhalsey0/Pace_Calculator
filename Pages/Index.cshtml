@@ -7,192 +7,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - My Application</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - My Application</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to Pace Chart Creator!</h1>
+  <div class="container">
+    <h1>Welcome to Pace Chart Creator!</h1>
 
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#questionModal">
-            Start Creating your Pace Chart
-        </button>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#questionModal">
+        Start Creating your Pace Chart
+    </button>
 
-        <!-- Modal -->
-        <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Questions</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" enctype="multipart/form-data">
-                            <div id="question1" class="question">
-                                <label>Do you have a file to upload?</label><br />
-                                <button type="button" class="btn btn-primary" onclick="showQuestion(2, true)">Yes</button>
-                                <button type="button" class="btn btn-secondary" onclick="showQuestion(3, false)">No</button>
+    <!-- Modal -->
+    <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Questions</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                  <form method="post" enctype="multipart/form-data">
+                        <div id="question1" class="question">
+                            <label>Do you have a file to upload?</label><br />
+                            <button type="button" class="btn btn-primary" onclick="showQuestion(2, true)">Yes</button>
+                            <button type="button" class="btn btn-secondary" onclick="showQuestion(3, false)">No</button>
+                        </div>
+                        <div id="question2" class="question" style="display:none;">
+                            <label>Please upload your file:</label><br />
+                            <input asp-for="GpxFileFromUser" type="file" class="form-control-file" /><br />
+                            <button type="button" class="btn btn-primary" onclick="showQuestion(5)">Next</button>
+                        </div>
+                        <div id="question3" class="question" style="display:none;">
+                            <label>Do you have a specific distance you want to run?</label><br />
+                            <button type="button" class="btn btn-primary" onclick="showQuestion(4, true)">Yes</button>
+                            <button type="button" class="btn btn-secondary" onclick="showQuestion(8, false)">No</button>
+                        </div>
+                        <div id="question4" class="question" style="display:none;">
+                            <label>Please enter the distance:</label><br />
+                            <input asp-for="InputDistance" type="number" step="0.01" class="form-control" /><br />
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="Unit" value="miles" id="miles" checked>
+                                <label class="form-check-label" for="miles">Miles</label>
                             </div>
-                            <div id="question2" class="question" style="display:none;">
-                                <label>Please upload your file:</label><br />
-                                <input asp-for="GpxFileFromUser" type="file" class="form-control-file" /><br />
-                                <button type="button" class="btn btn-primary" onclick="showQuestion(5)">Next</button>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="Unit" value="kilometers" id="kilometers">
+                                <label class="form-check-label" for="kilometers">Kilometers</label>
                             </div>
-                            <div id="question3" class="question" style="display:none;">
-                                <label>Do you have a specific distance you want to run?</label><br />
-                                <button type="button" class="btn btn-primary" onclick="showQuestion(4, true)">Yes</button>
-                                <button type="button" class="btn btn-secondary" onclick="showQuestion(5, false)">No</button>
-                            </div>
-                            <div id="question4" class="question" style="display:none;">
-                                <label>Please enter the distance:</label><br />
-                                <input asp-for="InputDistance" type="number" step="0.01" class="form-control" /><br />
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="Unit" value="miles" id="miles" checked>
-                                    <label class="form-check-label" for="Miles">Miles</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="Unit" value="kilometers" id="kilometers">
-                                    <label class="form-check-label" for="Kilometers">Kilometers</label>
-                                </div><br />
-                                <button type="button" class="btn btn-primary" onclick="showQuestion(5)">Next</button>
-                            </div>
-                            <div id="question5" class="question" style="display:none;">
-                                <label>Do you have a specific time you want to complete this course?</label><br />
-                                <button type="button" class="btn btn-primary" onclick="showQuestion(6, true)">Yes</button>
-                                <button type="button" class="btn btn-secondary" onclick="showQuestion(7, false)">No</button>
-                            </div>
-                            <div id="question6" class="question" style="display:none;">
-                                <label>What is your finish time for this course?</label><br />
-                                <input asp-for="TotalHours" type="text" class="form-control" />
-                                <label asp-for="TotalHours"/>
-                                <input asp-for="TotalMinutes" type="text" class="form-control" />
-                                <label asp-for="TotalMinutes"/>
-                                <input asp-for="TotalSeconds" type="text" class="form-control" />
-                                <label asp-for="TotalSeconds"/>
-                                <br />
-                                <button type="button" class="btn btn-primary" onclick="showQuestion(9)">Next</button>
-                            </div>
-                            <div id="question7" class="question" style="display:none;">
-                                <label>Do you have a specific pace you want to run?</label><br />
-                                <button type="button" class="btn btn-primary" onclick="showQuestion(8, true)">Yes</button>
-                                <button type="button" class="btn btn-secondary" onclick="showQuestion(5, false)">No</button>
-                            </div>
-                            <div id="question8" class="question" style="display:none;">
-                                <label>What is your finish time for this course?</label><br />
-                                <input asp-for="PaceHours" type="text" class="form-control" />
-                                <label asp-for="PaceHours"/>
-                                <input asp-for="PaceMinutes" type="text" class="form-control" />
-                                <label asp-for="PaceMinutes"/>
-                                <input asp-for="PaceSeconds" type="text" class="form-control" />
-                                <label asp-for="PaceSeconds"/>
-                                <br />
-                                <button type="button" class="btn btn-primary" onclick="showQuestion(9)">Next</button>
-                            </div>                            
-                            <div id="question9" class="question" style="display:none;">
-                                <label>Summary:</label><br />
-                                <p id="IndexModel"></p>
-                                <button type="submit" class="btn btn-success">Submit</button>
-                            </div>
-                        </form>
-                    </div>
+                            <button type="button" class="btn btn-primary" onclick="showQuestion(5)">Next</button>
+                        </div>
+                        <div id="question5" class="question" style="display:none;">
+                            <label>Do you have a specific time you want to complete this course?</label><br />
+                            <button type="button" class="btn btn-primary" onclick="showQuestion(6, true)">Yes</button>
+                            <button type="button" class="btn btn-secondary" onclick="showQuestion(7, false)">No</button>
+                        </div>
+                        <div id="question6" class="question" style="display:none;">
+                            <label>What is your finish time for this course?</label><br />
+                            <input asp-for="TotalHours" type="text" class="form-control" />
+                            <label asp-for="TotalHours">HH</label>
+                            <input asp-for="TotalMinutes" type="text" class="form-control" />
+                            <label asp-for="TotalMinutes">MM</label>
+                            <input asp-for="TotalSeconds" type="text" class="form-control" />
+                            <label asp-for="TotalSeconds">SS</label>
+                            <br />
+                            <button type="button" class="btn btn-primary" onclick="showQuestion(9)">Next</button>
+                        </div>
+                        <div id="question7" class="question" style="display:none;">
+                            <label>Do you have a specific pace you want to run?</label><br />
+                            <button type="button" class="btn btn-primary" onclick="showQuestion(8, true)">Yes</button>
+                            <button type="button" class="btn btn-secondary" onclick="showQuestion(5, false)">No</button>
+                        </div>
+                        <div id="question8" class="question" style="display:none;">
+                            <label>What is your finish time for this course?</label><br />
+                            <input asp-for="PaceHours" type="text" class="form-control" />
+                            <label asp-for="PaceHours">HH</label>
+                            <input asp-for="PaceMinutes" type="text" class="form-control" />
+                            <label asp-for="PaceMinutes">MM</label>
+                            <input asp-for="PaceSeconds" type="text" class="form-control" />
+                            <label asp-for="PaceSeconds">SS</label>
+                            <br />
+                            <button type="button" class="btn btn-primary" onclick="showQuestion(9)">Next</button>
+                        </div> 
+                        <div id="question9" class="question" style="display:none;">
+                            <label>Summary:</label><br />
+                            <p id="IndexModel"></p>
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+
     @if(Model.PaceCharts != null)
-  {
-  <div>
-    <table>
-      <tr>
-        <th>Mark</th><!--Will need to make this dynamic based on userInput.Unit-->
-        <th>Pace</th>
-        <th>Time</th>
-      </tr>
-      <tr>
-        @foreach(var p in Model.PaceCharts)
-        {
-          <tr>
-            <td>@p.Distance</td>
-            <td>@p.Pace</td>
-            <td>@p.CummulativeTime</td>
-          </tr>
-        }
-      </tr>
-    </table>
-  </div>
-@if(Model.GpxFileFromUser != null)
-{
-  <div>
-    <img src="@Model.ElevationChartUrl" alt= "An image of an elevation profile from the uploaded .gpx file.">
-  </div>
-}
-
-  <div>
-    <fieldset>
-      <legend>Pace</legend>
-      <div>
-        <input asp-for="PaceMinutes" class="form-control" />
-        <label asp-for="PaceMinutes">MM</label>
-      </div>
-      <div>
-        <input asp-for="PaceSeconds" class="form-control"/>
-        <label asp-for="PaceSeconds">SS</label>
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>Distance</legend>
-      <div>
-        <input asp-for="InputDistance" class="form-control"/>
-        <label asp-for="InputDistance">Distance</label>
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>Total Time</legend>
-      <div>
-        <input asp-for="TotalHours" class="form-control" />
-        <label asp-for="TotalHours">HH</label>
-      </div>
-      <div>
-        <input asp-for="TotalMinutes" class="form-control" />
-        <label asp-for="TotalMinutes">MM</label>
-      </div>
-      <div>
-        <input asp-for="TotalSeconds" class="form-control"/>
-        <label asp-for="TotalSeconds">SS</label>
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>Select your unit of distance</legend>
-      <div>
-          <input type="radio" id="km" name="Unit" value="km" checked />
-          <label for="km">km</label>
-      </div>
-      <div>
-          <input type="radio" id="miles" name="Unit" value="miles" />
-          <label for="miles">miles</label>
-      </div>
-    </fieldset>
-  </div>
-
-  }
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        function showQuestion(questionNumber, flag) {
-            document.querySelectorAll('.question').forEach((el) => el.style.display = 'none');
-            document.getElementById('question' + questionNumber).style.display = 'block';
-            if (flag !== undefined) {
-                if (questionNumber === 2 || questionNumber === 4) {
-                    // Store answers for summary
+    {
+        <div>
+            <table>
+                <tr>
+                    <th>Mark</th><!--Will need to make this dynamic based on userInput.Unit-->
+                    <th>Pace</th>
+                    <th>Time</th>
+                </tr>
+                @foreach(var p in Model.PaceCharts)
+                {
+                    <tr>
+                        <td>@p.Distance</td>
+                        <td>@p.Pace</td>
+                        <td>@p.CummulativeTime</td>
+                    </tr>
                 }
-            }
-        }
-    </script>
+            </table>
+        </div>
+    }
+
+    @if(Model.GpxFileFromUser != null)
+    {
+        <div>
+            <img src="@Model.ElevationChartUrl" alt="An image of an elevation profile from the uploaded .gpx file." />
+        </div>
+    }
+
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+      function showQuestion(questionNumber, flag) {
+          document.querySelectorAll('.question').forEach((el) => el.style.display = 'none');
+          document.getElementById('question' + questionNumber).style.display = 'block';
+          if (flag !== undefined) {
+              // Handle the flag logic if necessary
+          }
+      }
+  </script>
 </body>
 </html>
