@@ -49,6 +49,11 @@ public class UnitOfLength
     public static UnitOfLength NauticalMiles = new UnitOfLength(0.8684);
     public static UnitOfLength Miles = new UnitOfLength(1);
 
+    public UnitOfLength()
+    {
+        
+    }
+
     private readonly double _fromMilesFactor;
 
     private UnitOfLength(double fromMilesFactor)

@@ -50,12 +50,12 @@ namespace Pace_Calculator
             {
                 return 0;
             }
-            double distance = totalTime / pace; 
+            double distance = totalTime.TotalSeconds / pace.TotalSeconds; 
             return distance; //distance is equal to total time divided  by pace
         }
         public static TimeSpan TotalTimeCalculator(TimeSpan pace, double distance)
         {        
-            TimeSpan totalTime = pace * distance;
+            TimeSpan totalTime = TimeSpan.FromSeconds(pace.TotalSeconds * distance);
             return totalTime; //total time is equal to pace multiplied by distance
         }
 
@@ -78,7 +78,7 @@ namespace Pace_Calculator
                 return paceChartRows;
             } else
             {
-                for(int mark = 1; mark <= markerMax-1; mark++)
+                for(int mark = 1; mark < markerMax; mark++)
                 {
                     int Marker = mark;
                     double Distance = mark;
@@ -99,12 +99,12 @@ namespace Pace_Calculator
         {
             List<GpxInterval> gpxIntervals = FindIntervalsFromGpxFile(gpxFile);
             List<PaceChart> gradeAdjustedPaceChart = new List<PaceChart>();
-            double totalDistance = Math.Round(GetTotalDistanceFromGpxFile(gpxFile, calculatedInput),2);
+            double totalDistance = Math.Round(GetTotalDistanceFromGpxFile(gpxFile, calculatedInput.Unit),2);
             double markerMax = Math.Ceiling(totalDistance);
 
             if( totalDistance - Math.Floor(totalDistance) == 0)
             {
-                for (int mark = 0; mark <= markerMax;)
+                for (int mark = 0; mark <= markerMax; mark++)
                 {
                     int Marker = mark+1;
                     double Distance = mark+1;
@@ -116,7 +116,7 @@ namespace Pace_Calculator
                 return gradeAdjustedPaceChart;
             }else
             {
-                for (int mark = 0; mark <= markerMax;)
+                for (int mark = 0; mark <= markerMax; mark++)
                 {
                     int Marker = mark+1;
                     double Distance = mark+1;
@@ -146,7 +146,7 @@ namespace Pace_Calculator
                 return null;
             }
 
-            for (int i = 0; i < countOfPoints;)
+            for (int i = 0; i < countOfPoints - 1; i++)
             {
                 Coordinates start = coordinates[i];
                 Coordinates end = coordinates[i + 1];
@@ -159,54 +159,9 @@ namespace Pace_Calculator
             return gpxIntervals;
         }
 
-        // public static List<PaceChart> CalculateGradeAdjustedPaceChart(GpxFile gpxFile, CalculatedInput calculatedInput)
-        // {
-        //     List<PaceChart> paceChartRows = new List<PaceChart>();
-        //     List<TimeSpan> adjustedPaces = new List<TimeSpan>();
-        //     List<double> distanceBetweenPoints = GetDistanceBetweenPointsFromGpxFile(gpxFile, calculatedInput);
-        //     List<double> gradeBetweenPoints = GetGradeBetweenPoints(gpxFile, calculatedInput);
-        //     List<int> markers = GetMarkersFromGpxFile(gpxFile, calculatedInput);
-        //     List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
-        //     Coordinates start = coordinates[0];
-        //     Coordinates end = coordinates[^1];
-
-        //     foreach (double grade in gradeBetweenPoints)
-        //     {
-        //         adjustedPaces.Add(GradeAdjustedPace(calculatedInput.Pace, CalculatePaceAdjustment(grade)));
-        //     }
-
-        //     foreach (double distance in distanceBetweenPoints)
-        //     {
-        //         if (distance < 1)
-        //         {
-
-        //         }
-        //     }
-            
-        //     foreach (int marker in markers)
-        //     {
-        //         int Marker = marker;
-        //         double Distance = marker;
-        //         TimeSpan Pace = GradeAdjustedPace();
-        //         TimeSpan CummulativeTime = (TimeSpan)calculatedInput.Pace * marker;
-        //         paceChartRows.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));
-        //     }
-
-        //     int FinalMarker = paceChartRows.Count;
-        //     double FinalDistance = Math.Round(CoordinatesDistanceExtensions.DistanceTo(start,end,calculatedInput.Unit),2);
-        //     TimeSpan FinalPace = (TimeSpan) calculatedInput.Pace;
-        //     TimeSpan FinalCummulativeTime = (TimeSpan)calculatedInput.TotalTime;
-        //     paceChartRows.Add(new PaceChart(FinalMarker, FinalDistance, FinalPace, FinalCummulativeTime));
-        //     return paceChartRows;
-
-            
-
-
-        // }
-        
         public static TimeSpan GradeAdjustedPace(TimeSpan pace, double paceAdjustment)
         {
-            TimeSpan gradeAdjustedPace = pace.Multiply(paceAdjustment);
+            TimeSpan gradeAdjustedPace = TimeSpan.FromTicks((long)(pace.Ticks * paceAdjustment));
             
             return gradeAdjustedPace;
         }
@@ -245,7 +200,7 @@ namespace Pace_Calculator
             List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
             int countOfPoints = gpxFile.Waypoints.Count;
 
-            for (int i = 0; i < countOfPoints;)
+            for (int i = 0; i < countOfPoints - 1; i++)
             {
                 Coordinates start = coordinates[i];
                 Coordinates end = coordinates[i + 1];
@@ -261,20 +216,20 @@ namespace Pace_Calculator
 
             foreach (var point in gpxFile.Waypoints)
             {
-                double elevation = (double)point.Elevation;
+                double elevation = point.Elevation ?? 0;
                 elevationPoints.Add(elevation);
             }
             return elevationPoints;
         }
 
-        public static List<double> GetGradeBetweenPoints(GpxFile gpxFile, CalculatedInput calculatedInput)
+        public static List<double> GetGradeBetweenPoints(GpxFile gpxFile)
         {
             List<double> grade = new List<double>();
             List<double> distanceBetweenPoints = GetDistanceBetweenPointsFromGpxFile(gpxFile);
             List<double> elevationPoints = GetElevationPoints(gpxFile);
             elevationPoints.RemoveAt(elevationPoints.Count - 1);
 
-            for (int i = 0; i < elevationPoints.Count;)
+            for (int i = 0; i < elevationPoints.Count; i++)
             {
                 if(distanceBetweenPoints[i] == 0)
                 {
@@ -289,7 +244,7 @@ namespace Pace_Calculator
         {
             double distance = CoordinatesDistanceExtensions.DistanceTo(start, end);
             double elevationChange = startElevation - endElevation;
-            if ( distance < 0)
+            if ( distance <= 0)
             {
                 return 0;
             }
@@ -300,30 +255,30 @@ namespace Pace_Calculator
 
 
 
-        public static List<int> GetMarkersFromGpxFile(GpxFile gpxFile, CalculatedInput calculatedInput)
+        public static List<int> GetMarkersFromGpxFile(GpxFile gpxFile, UnitOfLength unitOfLength)
         {
             List<int> markers = new List<int>();
-            UnitOfLength unitOfLength = calculatedInput.Unit;
+            UnitOfLength unit = unitOfLength;
             List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
             Coordinates start = coordinates[0];
             Coordinates end = coordinates[^1];
-            double totalDistance = CoordinatesDistanceExtensions.DistanceTo(start, end, calculatedInput.Unit);
+            double totalDistance = CoordinatesDistanceExtensions.DistanceTo(start, end, unit);
 
-            for (int mark = 0; mark < totalDistance+1;)
+            for (int mark = 0; mark <= totalDistance; mark++)
             {
                 markers.Add(mark);
             }
 
             return markers;
         }
-        public static double GetTotalDistanceFromGpxFile(GpxFile gpxFile, CalculatedInput calculatedInput)
+        public static double GetTotalDistanceFromGpxFile(GpxFile gpxFile, UnitOfLength unitOfLength)
         {
             List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
-            UnitOfLength unitOfLength = calculatedInput.Unit;
+            UnitOfLength unit = unitOfLength;
             Coordinates start = coordinates [0];
             Coordinates end = coordinates [^1];
 
-            return CoordinatesDistanceExtensions.DistanceTo(start, end, unitOfLength);
+            return CoordinatesDistanceExtensions.DistanceTo(start, end, unit);
         }
     }
 }

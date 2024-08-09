@@ -69,8 +69,11 @@
                             <div id="question6" class="question" style="display:none;">
                                 <label>What is your finish time for this course?</label><br />
                                 <input asp-for="TotalHours" type="text" class="form-control" />
+                                <label asp-for="TotalHours"/>
                                 <input asp-for="TotalMinutes" type="text" class="form-control" />
+                                <label asp-for="TotalMinutes"/>
                                 <input asp-for="TotalSeconds" type="text" class="form-control" />
+                                <label asp-for="TotalSeconds"/>
                                 <br />
                                 <button type="button" class="btn btn-primary" onclick="showQuestion(9)">Next</button>
                             </div>
@@ -82,8 +85,11 @@
                             <div id="question8" class="question" style="display:none;">
                                 <label>What is your finish time for this course?</label><br />
                                 <input asp-for="PaceHours" type="text" class="form-control" />
+                                <label asp-for="PaceHours" />
                                 <input asp-for="PaceMinutes" type="text" class="form-control" />
+                                <label asp-for="PaceMinutes" />
                                 <input asp-for="PaceSeconds" type="text" class="form-control" />
+                                <label asp-for="PaceSeconds" />
                                 <br />
                                 <button type="button" class="btn btn-primary" onclick="showQuestion(9)">Next</button>
                             </div>                            
@@ -109,6 +115,27 @@
       </tr>
       <tr>
         @foreach(var p in Model.PaceCharts)
+        {
+          <tr>
+            <td>@p.Distance</td>
+            <td>@p.Pace</td>
+            <td>@p.CummulativeTime</td>
+          </tr>
+        }
+      </tr>
+    </table>
+  </div>
+      @if(Model.gradeAdjustedPaceChart != null)
+  {
+  <div>
+    <table>
+      <tr>
+        <th>Mark</th><!--Will need to make this dynamic based on userInput.Unit-->
+        <th>Grade Adjusted Pace</th>
+        <th>Time</th>
+      </tr>
+      <tr>
+        @foreach(var p in Model.gradeAdjustedPaceChart)
         {
           <tr>
             <td>@p.Distance</td>
