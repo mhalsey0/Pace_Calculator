@@ -1,91 +1,226 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using RolandK.Formats.Gpx;
 
 namespace Pace_Calculator.Pages
 {
     public class IndexModel : PageModel
     {
-        [BindProperty]
+        [BindProperty, Description("Hours"),]
+        public int PaceHours { get; set; }
+        
+        [BindProperty, Description("Minutes")]
         public int PaceMinutes { get; set; }
-        [BindProperty]
+        
+        [BindProperty, Description("Seconds")]
         public int PaceSeconds { get; set; }
-        [BindProperty]
+        
+        [BindProperty, Description("Distance"),Range(0.01, double.MaxValue, ErrorMessage = "Distance must be greater than 0.")]
         public double InputDistance { get; set; }
-        [BindProperty]
+        
+        [BindProperty, Description("Hours")]
         public int TotalHours { get; set; }
-        [BindProperty]
+        
+        [BindProperty, Description("Minutes")]
         public int TotalMinutes { get; set; }
-        [BindProperty]
+        
+        [BindProperty, Description("Seconds")]
         public int TotalSeconds { get; set; }
+        
+        [BindProperty, Required]
+        public UnitOfLength Unit { get; set; }
+        
         [BindProperty]
-        [Required]
-        public required string Unit { get; set; }
-        [BindProperty, Display(Name = "Course")]
-        public IFormFile? GpxFile { get; set; }
-        public List<PaceChart> paceCharts { get; set; }
+        public IFormFile? GpxFileFromUser { get; set; }
+        [BindProperty]
+        public List<PaceChart> PaceCharts { get; set; }
+        [BindProperty]
+        public string ElevationChartUrl { get; set; }
 
         private readonly ILogger<IndexModel> _logger;
-        private readonly IHostEnvironment _environment;
+        private readonly IWebHostEnvironment _environment;
 
-        public IndexModel(ILogger<IndexModel> logger, IHostEnvironment environment)
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Model state is invalid.");
+                return Page();
+            }
+            try
+            {
+                _logger.LogInformation("Calling Image API");
 
+                if (GpxFileFromUser != null)
+                {
+                    await GPXUploadAsync();
+                    var filePath = Path.Combine(_environment.WebRootPath, "FileUpload", GpxFileFromUser.FileName);
+                    GpxFile gpxFile;
+                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        gpxFile = GpxFile.Load(fileStream);
+                    }
+                    ElevationChartUrl = ChartImageGenerator.GenerateChartImage(gpxFile); 
+                }        
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during post processing.");
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
+                return Page();
+            }
+
+            return Page();
         }
-        public IActionResult OnPost()
-        {
-            ModelState.Clear();
-            UserInput userInput = new()
-            {
-                Pace = new TimeSpan( 0,PaceMinutes, PaceSeconds),
-                Distance = InputDistance,
-                TotalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds),
-                Unit = Unit
-            };
-            CalculatedInput calculatedInput = new()
-            {
-                Pace = new TimeSpan(0,0,0),
-                Distance = 0,
-                TotalTime = new TimeSpan(0,0,0)
-            };
 
-            Calculators.Calculate(userInput, calculatedInput);
-            
-            
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Model state is invalid.");
+                return Page();
+            }
+            try
+            {
+                _logger.LogInformation("Processing user input.");
+                
+                ModelState.Clear();
+
+                TimeSpan totalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds);
+                TimeSpan pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds);
+
+                // Added null check before accessing GpxFileFromUser properties
+                if (GpxFileFromUser != null)
+                {
+                    await GPXUploadAsync();
+                    var filePath = Path.Combine(_environment.WebRootPath, "FileUpload", GpxFileFromUser.FileName);
+                    GpxFile gpxFile;
+                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        gpxFile = GpxFile.Load(fileStream);
+                    }
+                    var distance = Calculators.GetTotalDistanceFromGpxFile(gpxFile, Unit);
+
+                    // Refactored repeated code into a method to avoid duplication
+                    if (totalTime != TimeSpan.Zero)
+                    {
+                        TimeSpan pace1 = Calculators.PaceCalculator(totalTime,distance);
+                    
+                        UserInput userInput1 = new()
+                        {
+                            Pace = pace1,
+                            Distance = distance,
+                            TotalTime = totalTime,
+                            Unit = Unit,
+                            GpxFileFromUser = GpxFileFromUser
+                        };
+                        CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
+                        UpdateProperties(calculatedInput1);
+                        var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1);                        
+                    }
+
+                    if (pace != TimeSpan.Zero)
+                    {
+                        TimeSpan totalTime1 = Calculators.TotalTimeCalculator(pace, distance);
+                        
+                        UserInput userInput1 = new()
+                        {
+                            Pace = pace,
+                            Distance = distance,
+                            TotalTime = totalTime1,
+                            Unit = Unit,
+                            GpxFileFromUser = GpxFileFromUser
+                        };
+                        CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
+                        UpdateProperties(calculatedInput1);
+                        var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1); 
+                    }
+                    return RedirectToPage();
+                }
+                else
+                {
+                    // Process calculation without GPX file
+                    UserInput userInput = new()
+                    {
+                        Pace = pace,
+                        Distance = InputDistance,
+                        TotalTime = totalTime,
+                        Unit = Unit,
+                        GpxFileFromUser = GpxFileFromUser
+                    };
+                    CalculatedInput calculatedInput = Calculators.Calculate(userInput);
+
+                    UpdateProperties(calculatedInput);
+
+                    PaceCharts = Calculators.CalculatePaceChart(calculatedInput);
+
+                    _logger.LogInformation("Processing completed successfully.");
+                    return Page();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during post processing.");
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
+                return Page();
+            }
+
+            return Page();
+        }
+
+        private void UpdateProperties(CalculatedInput calculatedInput)
+        {
+            PaceHours = calculatedInput.Pace.Hours;
             PaceMinutes = calculatedInput.Pace.Minutes;
             PaceSeconds = calculatedInput.Pace.Seconds;
             InputDistance = calculatedInput.Distance;
             TotalHours = calculatedInput.TotalTime.Hours;
             TotalMinutes = calculatedInput.TotalTime.Minutes;
             TotalSeconds = calculatedInput.TotalTime.Seconds;
-            
-            List<PaceChart> paceChart = new List<PaceChart>();
-            
-            paceCharts = Calculators.CalculatePaceChart(userInput);
-
-            Console.WriteLine(userInput.Pace.ToString(), userInput.Distance.ToString(), userInput.TotalTime.ToString());
-
-            return Page();
         }
-        public async Task OnPostGPXUploadAsync()
+
+        private async Task GPXUploadAsync()
         {
-            if (GpxFile == null || GpxFile.Length == 0)
+            if (GpxFileFromUser == null || GpxFileFromUser.Length == 0)
             {
+                _logger.LogWarning("No file uploaded or file is empty.");
                 return;
             }
- 
-            _logger.LogInformation($"Uploading {GpxFile.FileName}.");
-            string targetFileName = $"{_environment.ContentRootPath}/{GpxFile.FileName}";
- 
-            using (var stream = new FileStream(targetFileName, FileMode.Create))
+
+            try
             {
-                await GpxFile.CopyToAsync(stream);
+                _logger.LogInformation($"Uploading {GpxFileFromUser.FileName}.");
+                
+                var cleanFileName = Path.GetFileNameWithoutExtension(GpxFileFromUser.FileName);
+                var fileExtension = Path.GetExtension(GpxFileFromUser.FileName);
+                var safeFileName = $"{cleanFileName}_{Guid.NewGuid()}{fileExtension}";
+                
+                var uploadPath = Path.Combine(_environment.WebRootPath, "FileUpload");
+                if (!Directory.Exists(uploadPath))
+                {
+                    Directory.CreateDirectory(uploadPath);
+                }
+
+                var filePath = Path.Combine(uploadPath, safeFileName);
+                
+                await using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await GpxFileFromUser.CopyToAsync(stream);
+                }
+
+                _logger.LogInformation($"File uploaded successfully to {filePath}.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while uploading the file.");
             }
         }
     }
