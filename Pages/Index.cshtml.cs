@@ -8,7 +8,7 @@ namespace Pace_Calculator.Pages
 {
     public class IndexModel : PageModel
     {
-        [BindProperty, Description("Hours")]
+        [BindProperty, Description("Hours"),]
         public int PaceHours { get; set; }
         
         [BindProperty, Description("Minutes")]
@@ -34,8 +34,10 @@ namespace Pace_Calculator.Pages
         
         [BindProperty]
         public IFormFile? GpxFileFromUser { get; set; }
-        
+        [BindProperty]
         public List<PaceChart> PaceCharts { get; set; }
+        [BindProperty]
+        public string ElevationChartUrl { get; set; }
 
         private readonly ILogger<IndexModel> _logger;
         private readonly IWebHostEnvironment _environment;
@@ -46,9 +48,37 @@ namespace Pace_Calculator.Pages
             _environment = environment;
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
-            // Removed unnecessary method if not used.
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Model state is invalid.");
+                return Page();
+            }
+            try
+            {
+                _logger.LogInformation("Calling Image API");
+
+                if (GpxFileFromUser != null)
+                {
+                    await GPXUploadAsync();
+                    var filePath = Path.Combine(_environment.WebRootPath, "FileUpload", GpxFileFromUser.FileName);
+                    GpxFile gpxFile;
+                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                    {
+                        gpxFile = GpxFile.Load(fileStream);
+                    }
+                    ElevationChartUrl = ChartImageGenerator.GenerateChartImage(gpxFile); 
+                }        
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during post processing.");
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
+                return Page();
+            }
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -58,7 +88,6 @@ namespace Pace_Calculator.Pages
                 _logger.LogWarning("Model state is invalid.");
                 return Page();
             }
-
             try
             {
                 _logger.LogInformation("Processing user input.");
@@ -114,6 +143,7 @@ namespace Pace_Calculator.Pages
                         UpdateProperties(calculatedInput1);
                         var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1); 
                     }
+                    return RedirectToPage();
                 }
                 else
                 {

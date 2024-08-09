@@ -14,11 +14,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to the Application</h1>
+        <h1>Welcome to Pace Chart Creator!</h1>
 
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#questionModal">
-            Start Questions
+            Start Creating your Pace Chart
         </button>
 
         <!-- Modal -->
@@ -85,11 +85,11 @@
                             <div id="question8" class="question" style="display:none;">
                                 <label>What is your finish time for this course?</label><br />
                                 <input asp-for="PaceHours" type="text" class="form-control" />
-                                <label asp-for="PaceHours" />
+                                <label asp-for="PaceHours"/>
                                 <input asp-for="PaceMinutes" type="text" class="form-control" />
-                                <label asp-for="PaceMinutes" />
+                                <label asp-for="PaceMinutes"/>
                                 <input asp-for="PaceSeconds" type="text" class="form-control" />
-                                <label asp-for="PaceSeconds" />
+                                <label asp-for="PaceSeconds"/>
                                 <br />
                                 <button type="button" class="btn btn-primary" onclick="showQuestion(9)">Next</button>
                             </div>                            
@@ -125,7 +125,14 @@
       </tr>
     </table>
   </div>
-  <form method="post">
+@if(Model.GpxFileFromUser != null)
+{
+  <div>
+    <img src="@Model.ElevationChartUrl" alt= "An image of an elevation profile from the uploaded .gpx file.">
+  </div>
+}
+
+  <div>
     <fieldset>
       <legend>Pace</legend>
       <div>
@@ -170,7 +177,7 @@
           <label for="miles">miles</label>
       </div>
     </fieldset>
-  </form>
+  </div>
 
   }
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

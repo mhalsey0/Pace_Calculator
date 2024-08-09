@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ImageCharts" Version="6.1.254" />
     <PackageReference Include="popper.js" Version="1.16.1" />
     <PackageReference Include="RolandK.Formats.Gpx" Version="1.0.1" />
   </ItemGroup>
