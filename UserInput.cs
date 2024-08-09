@@ -1,5 +1,6 @@
 namespace Pace_Calculator
 {
+    //Class to hold and format UserInput
     public class UserInput
     {
         public TimeSpan Pace { get; set; }

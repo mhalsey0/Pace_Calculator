@@ -97,7 +97,7 @@ namespace Pace_Calculator.Pages
                 TimeSpan totalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds);
                 TimeSpan pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds);
 
-                // Added null check before accessing GpxFileFromUser properties
+                //Process calculation with GPX file
                 if (GpxFileFromUser != null)
                 {
                     await GPXUploadAsync();
@@ -109,7 +109,6 @@ namespace Pace_Calculator.Pages
                     }
                     var distance = Calculators.GetTotalDistanceFromGpxFile(gpxFile, Unit);
 
-                    // Refactored repeated code into a method to avoid duplication
                     if (totalTime != TimeSpan.Zero)
                     {
                         TimeSpan pace1 = Calculators.PaceCalculator(totalTime,distance);

@@ -167,7 +167,7 @@ namespace Pace_Calculator
             
             return gradeAdjustedPace;
         }
-
+        //This formula is based on the Strava gradient adjusted pace curve as discused at this link: https://pickletech.eu/blog-gap/
         public static double CalculatePaceAdjustment(double grade)
         {
             // Constants for polynomial equation for PaceAdjustment
@@ -242,7 +242,7 @@ namespace Pace_Calculator
             }
             return grade;
         }
-
+        //This takes elements derived from the GpxFile class to provide data. It's an example of the Liskov Substitution Principle in SOLID.
         public static double GetGradeFromCoordinatesWithElevation(Coordinates start, Coordinates end, double startElevation, double endElevation)
         {
             double distance = CoordinatesDistanceExtensions.DistanceTo(start, end);

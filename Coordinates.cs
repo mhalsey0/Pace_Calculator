@@ -24,6 +24,7 @@ public static class CoordinatesDistanceExtensions
         return DistanceTo(baseCoordinates, targetCoordinates, UnitOfLength.Kilometers);
     }
 
+    //This method finds the distance between two gps coordinates.
     public static double DistanceTo(this Coordinates baseCoordinates, Coordinates targetCoordinates, UnitOfLength unitOfLength)
     {
         var baseRad = Math.PI * baseCoordinates.Latitude / 180;

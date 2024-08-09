@@ -1,5 +1,6 @@
 namespace Pace_Calculator
 {
+    //Holds information required to populate a pace chart. This is an example of single use principle in SOLID.
     public class PaceChart
     {
         public int Marker { get; set; }
