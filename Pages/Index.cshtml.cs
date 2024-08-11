@@ -37,7 +37,7 @@ namespace Pace_Calculator.Pages
         [BindProperty]
         public List<PaceChart> PaceCharts { get; set; }
         [BindProperty]
-        public string ElevationChartUrl { get; set; }
+        public string? ElevationChartUrl { get; set; }
 
         private readonly ILogger<IndexModel> _logger;
         private readonly IWebHostEnvironment _environment;
