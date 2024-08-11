@@ -95,6 +95,8 @@ namespace Pace_Calculator
                 paceChartRows.Add(new PaceChart(FinalMarker, FinalDistance, FinalPace, FinalCummulativeTime));
                 return paceChartRows;
             }
+            System.Console.WriteLine("PaceChart is null");
+            return null;
         }
 
         public static List<PaceChart> CalculateGradeAdjustedPaceChart(GpxFile gpxFile, CalculatedInput calculatedInput)
