@@ -1,3 +1,4 @@
+using System.Drawing;
 using RolandK.Formats.Gpx;
 
 
@@ -142,15 +143,14 @@ namespace Pace_Calculator
             List<GpxInterval> gpxIntervals = new List<GpxInterval>();
             List<double> elevation = GetElevationPoints(gpxFile);
             List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
-            int countOfPoints = gpxFile.Waypoints.Count;
 
-            if(countOfPoints != coordinates.Count || countOfPoints != elevation.Count)
+            if(coordinates.Count != elevation.Count)
             {
-                System.Console.WriteLine("waypoints does not equal the count of coordinates or count of elevation points");
+                System.Console.WriteLine("Count of coordinates and elevation points are not equal.");
                 return null;
             }
 
-            for (int i = 0; i < countOfPoints - 1; i++)
+            for (int i = 0; i < coordinates.Count - 1; i++)
             {
                 Coordinates start = coordinates[i];
                 Coordinates end = coordinates[i + 1];
@@ -185,25 +185,69 @@ namespace Pace_Calculator
             double PaceAdjustment = a4 * Math.Pow(x, 4) + a3 * Math.Pow(x, 3) + a2 * Math.Pow(x, 2) + a1 * x + a0;
             return PaceAdjustment;
         }
+        // public static List<T> CreateNewList<T>(List<T> t)
+        // {
+        //     List<T> list = new List<T>();
 
+        //     foreach (var item in t)
+        //     {
+        //         list.Add(item);
+        //     }
+
+        //     return list;
+        // }
+
+        public static List<GpxTrack> GetGpxTracks(GpxFile gpxFile)
+        {
+            List<GpxTrack> gpxTracks = new List<GpxTrack>();
+
+            foreach (var track in gpxFile.Tracks)
+            {
+                gpxTracks.Add(track);
+            }
+            return gpxTracks;
+        }
         public static List<Coordinates> CreateCoordinatesFromGpxFile(GpxFile gpxFile)
         {
             List<Coordinates> coordinates = new List<Coordinates>();
 
-            foreach (var point in gpxFile.Waypoints)
+            foreach (var track in gpxFile.Tracks)
             {
-                double longitude = point.Longitude;
-                double latitude = point.Latitude;
-                coordinates.Add(new Coordinates(longitude, latitude));
+                foreach(var segment in track.Segments)
+                {
+                    foreach (var point in segment.Points)
+                    {   
+                        double longitude = point.Longitude;
+                        double latitude = point.Latitude;
+
+                        coordinates.Add(new Coordinates(longitude, latitude));
+                    }
+                }
             }
             return coordinates;
         }
+        public static int GetCountOfPoints(GpxFile gpxFile)
+        {
+            List<GpxTrackSegment> listOfSegments = new List<GpxTrackSegment>();
+
+
+            foreach (var track in gpxFile.Tracks)
+            {
+                foreach(var segment in track.Segments)
+                {
+                    listOfSegments.Add(segment);
+                }
+            }
+            int countOfPoints = listOfSegments.Count;
+            return countOfPoints;
+        }
+
 
         public static List<double> GetDistanceBetweenPointsFromGpxFile(GpxFile gpxFile)
         {
             List<double> distanceBetweenPoints = new List<double>();
             List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
-            int countOfPoints = gpxFile.Waypoints.Count;
+            int countOfPoints = GetCountOfPoints(gpxFile);
 
             for (int i = 0; i < countOfPoints - 1; i++)
             {
@@ -219,10 +263,18 @@ namespace Pace_Calculator
         {
             List<double> elevationPoints = new List<double>();
 
-            foreach (var point in gpxFile.Waypoints)
+            foreach (var track in gpxFile.Tracks)
             {
-                double elevation = point.Elevation ?? 0;
-                elevationPoints.Add(elevation);
+                foreach (var segment in track.Segments)
+                {
+                    foreach(var point in segment.Points)
+                    {
+                        double elevation = point.Elevation ?? 0;
+                        elevationPoints.Add(elevation);
+                    }
+
+                }
+
             }
             return elevationPoints;
         }

@@ -171,8 +171,6 @@ namespace Pace_Calculator.Pages
                 ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
                 return Page();
             }
-
-            return Page();
         }
 
         private void UpdateProperties(CalculatedInput calculatedInput)
@@ -200,7 +198,7 @@ namespace Pace_Calculator.Pages
                 
                 var cleanFileName = Path.GetFileNameWithoutExtension(GpxFileFromUser.FileName);
                 var fileExtension = Path.GetExtension(GpxFileFromUser.FileName);
-                var safeFileName = $"{cleanFileName}_{Guid.NewGuid()}{fileExtension}";
+                var safeFileName = $"{cleanFileName}{fileExtension}"; //Ideally would add a unique identifier here to keep the file sanitized.
                 
                 var uploadPath = Path.Combine(_environment.WebRootPath, "FileUpload");
                 if (!Directory.Exists(uploadPath))
@@ -209,6 +207,7 @@ namespace Pace_Calculator.Pages
                 }
 
                 var filePath = Path.Combine(uploadPath, safeFileName);
+                System.Console.WriteLine(filePath);
                 
                 await using (var stream = new FileStream(filePath, FileMode.Create))
                 {
