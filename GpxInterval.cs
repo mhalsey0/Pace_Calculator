@@ -10,9 +10,6 @@ namespace Pace_Calculator
             Grade = grade;
         }
 
-        public List<Coordinates> StartCoordinates { get; set; }
-        public List<Coordinates> EndCoordinates { get; set;}
-        public double Distance { get; set; }
         public double Grade { get; set; }
         public Coordinates Start { get; set;}
         public Coordinates End { get; set;}

@@ -1,4 +1,5 @@
 using System.Drawing;
+using Microsoft.AspNetCore.Components;
 using RolandK.Formats.Gpx;
 
 
@@ -70,7 +71,7 @@ namespace Pace_Calculator
 
             if (calculatedInput.Distance - Math.Floor((double)calculatedInput.Distance) == 0)
             {
-                for (int mark = 0; mark <= markerMax; mark++)
+                for (int mark = 1; mark <= markerMax; mark++)
                 {
                     int Marker = mark;
                     double Distance = mark;
@@ -78,6 +79,7 @@ namespace Pace_Calculator
                     TimeSpan CummulativeTime = (TimeSpan)calculatedInput.Pace * mark;
                     paceChartRows.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));                
                 }
+                return paceChartRows;
             }
             else
             {
@@ -96,39 +98,38 @@ namespace Pace_Calculator
                 paceChartRows.Add(new PaceChart(FinalMarker, FinalDistance, FinalPace, FinalCummulativeTime));
                 return paceChartRows;
             }
-            System.Console.WriteLine("PaceChart is null");
-            return null;
         }
 
         public static List<PaceChart> CalculateGradeAdjustedPaceChart(GpxFile gpxFile, CalculatedInput calculatedInput)
         {
             List<GpxInterval> gpxIntervals = FindIntervalsFromGpxFile(gpxFile, calculatedInput.Unit);
             List<PaceChart> gradeAdjustedPaceChart = new List<PaceChart>();
-            double totalDistance = Math.Round(GetTotalDistanceFromGpxFile(gpxFile, calculatedInput.Unit),2);
+            double totalDistance = Math.Round(SumDistanceFromGpxFile(gpxFile, calculatedInput.Unit),2);
+            List<int> markers = GetMarkersFromGpxFile(gpxFile,calculatedInput.Unit);
             double markerMax = Math.Ceiling(totalDistance);
 
             if( totalDistance - Math.Floor(totalDistance) == 0)
             {
-                for (int mark = 0; mark <= markerMax; mark++)
+                for (int i = 0; i <= markerMax; i++)
                 {
-                    int Marker = mark+1;
-                    double Distance = mark+1;
-                    double grade = gpxIntervals[mark].Grade;
+                    int Marker = i+1;
+                    double Distance = i+1;
+                    double grade = GetAverageGradeFromListofIntervals(gpxIntervals,i,i+1);
                     TimeSpan Pace = GradeAdjustedPace(calculatedInput.Pace,CalculatePaceAdjustment(grade));
-                    TimeSpan CummulativeTime = (TimeSpan)Pace * mark;
+                    TimeSpan CummulativeTime = (TimeSpan)Pace * i;
                     gradeAdjustedPaceChart.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));                
                 }
                 return gradeAdjustedPaceChart;
             }else
             {
-                for (int mark = 0; mark <= markerMax; mark++)
+                for (int i = 0; i <= markerMax; i++)
                 {
-                    int Marker = mark+1;
-                    double Distance = mark+1;
-                    double grade = gpxIntervals[mark].Grade;
+                    int Marker = i+1;
+                    double Distance = i+1;
+                    double grade = GetAverageGradeFromListofIntervals(gpxIntervals,i,i+1);
                     TimeSpan Pace = GradeAdjustedPace(calculatedInput.Pace,CalculatePaceAdjustment(grade));
-                    TimeSpan CummulativeTime = Pace * mark;
-                    gradeAdjustedPaceChart.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));                
+                    TimeSpan CummulativeTime = (TimeSpan)Pace * i;
+                    gradeAdjustedPaceChart.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));               
                 }
                 int FinalMarker = gradeAdjustedPaceChart.Count;
                 double FinalDistance = Math.Round((double)calculatedInput.Distance - Math.Floor((double)calculatedInput.Distance),2);
@@ -328,22 +329,37 @@ namespace Pace_Calculator
             return grade;
         }
 
-
-
-        public static List<int> GetMarkersFromGpxFile(GpxFile gpxFile, UnitOfLength unitOfLength)
+        public static double GetAverageGradeFromListofIntervals(List<GpxInterval> intervalList, int startIndex, int endIndex)
         {
-            List<int> markers = new List<int>();
-            UnitOfLength unit = unitOfLength;
-            List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
-            Coordinates start = coordinates[0];
-            Coordinates end = coordinates[^1];
-            double totalDistance = CoordinatesDistanceExtensions.DistanceTo(start, end, unit);
+            double totalGrade = 0;
+            int numberOfIndices = (endIndex - startIndex) + 1;
 
-            for (int mark = 0; mark <= totalDistance; mark++)
+            for (int i = 0; i < numberOfIndices; i++)
             {
-                markers.Add(mark);
+                GpxInterval interval = intervalList[startIndex + i];
+                totalGrade += interval.Grade;
             }
 
+            return totalGrade / numberOfIndices;
+        }
+
+        public static List<int> GetMarkersFromGpxFile(GpxFile gpxFile, string unit)
+        {
+            List<int> markers = new List<int>();
+            List<GpxInterval> intervals = FindIntervalsFromGpxFile(gpxFile, unit);
+            double totalDistance = 0;
+            int countOfIntervals = intervals.Count;
+
+
+            for (int i = 0; i < countOfIntervals; i++)
+            {
+                totalDistance += intervals[i].DistanceBetweenPoints;
+
+                if (totalDistance % 1 == 0)
+                {
+                    markers.Add(i);
+                }
+            }
             return markers;
         }
 

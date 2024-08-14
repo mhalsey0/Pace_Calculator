@@ -77,7 +77,7 @@ namespace Pace_Calculator.Pages
                     {
                         gpxFile = GpxFile.Load(fileStream);
                     }
-                    var distance = Math.Round(Calculators.SumDistanceFromGpxFile(gpxFile, Unit),2);
+                    var distance = Calculators.SumDistanceFromGpxFile(gpxFile, Unit);
 
                     if (totalTime != TimeSpan.Zero)
                     {
@@ -93,7 +93,8 @@ namespace Pace_Calculator.Pages
                         };
                         CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
                         UpdateProperties(calculatedInput1);
-                        var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1);                        
+                        var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1); 
+                        PaceCharts = gradeAdjustedPaceChart;                       
                     }
 
                     if (pace != TimeSpan.Zero)
@@ -111,6 +112,7 @@ namespace Pace_Calculator.Pages
                         CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
                         UpdateProperties(calculatedInput1);
                         var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1); 
+                        PaceCharts = gradeAdjustedPaceChart; 
                     }
                     ElevationChartUrl = ChartImageGenerator.GenerateChartImage(gpxFile); 
                     return Page();
@@ -150,7 +152,7 @@ namespace Pace_Calculator.Pages
             PaceHours = calculatedInput.Pace.Hours;
             PaceMinutes = calculatedInput.Pace.Minutes;
             PaceSeconds = calculatedInput.Pace.Seconds;
-            InputDistance = calculatedInput.Distance;
+            InputDistance = Math.Round(calculatedInput.Distance, 2);
             TotalHours = calculatedInput.TotalTime.Hours;
             TotalMinutes = calculatedInput.TotalTime.Minutes;
             TotalSeconds = calculatedInput.TotalTime.Seconds;
