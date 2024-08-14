@@ -102,7 +102,7 @@ namespace Pace_Calculator
 
         public static List<PaceChart> CalculateGradeAdjustedPaceChart(GpxFile gpxFile, CalculatedInput calculatedInput)
         {
-            List<GpxInterval> gpxIntervals = FindIntervalsFromGpxFile(gpxFile);
+            List<GpxInterval> gpxIntervals = FindIntervalsFromGpxFile(gpxFile, calculatedInput.Unit);
             List<PaceChart> gradeAdjustedPaceChart = new List<PaceChart>();
             double totalDistance = Math.Round(GetTotalDistanceFromGpxFile(gpxFile, calculatedInput.Unit),2);
             double markerMax = Math.Ceiling(totalDistance);
@@ -138,13 +138,13 @@ namespace Pace_Calculator
                 return gradeAdjustedPaceChart;                 
             }
         }
-        public static List<GpxInterval> FindIntervalsFromGpxFile(GpxFile gpxFile)
+        public static List<GpxInterval> FindIntervalsFromGpxFile(GpxFile gpxFile, string unit)
         {
             List<GpxInterval> gpxIntervals = new List<GpxInterval>();
             List<double> elevation = GetElevationPoints(gpxFile);
             List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
 
-            if(coordinates.Count != elevation.Count)
+            if (coordinates.Count != elevation.Count)
             {
                 System.Console.WriteLine("Count of coordinates and elevation points are not equal.");
                 return null;
@@ -152,15 +152,27 @@ namespace Pace_Calculator
 
             for (int i = 0; i < coordinates.Count - 1; i++)
             {
-                Coordinates start = coordinates[i];
-                Coordinates end = coordinates[i + 1];
-                double startElevation = elevation[i];
-                double endElevation = elevation[i + 1];
-                double distanceBetweenPoints = CoordinatesDistanceExtensions.DistanceTo(start, end);
-                double grade = GetGradeFromCoordinatesWithElevation(start, end, startElevation, endElevation);
-                gpxIntervals.Add(new GpxInterval(start, end, distanceBetweenPoints, grade));
+                GpxInterval interval = CreateGpxInterval(coordinates[i], coordinates[i + 1], elevation[i], elevation[i + 1], unit);
+                gpxIntervals.Add(interval);
             }
+
             return gpxIntervals;
+        }
+
+        private static GpxInterval CreateGpxInterval(Coordinates start, Coordinates end, double startElevation, double endElevation, string unit)
+        {
+            if(unit != "Miles")
+            {
+            double distanceBetweenPoints = CoordinatesDistanceExtensions.DistanceTo(start, end, UnitOfLength.Kilometers);
+            double grade = GetGradeFromCoordinatesWithElevation(start, end, startElevation, endElevation);
+            return new GpxInterval(start, end, distanceBetweenPoints, grade);
+            }
+            else
+            {
+            double distanceBetweenPoints = CoordinatesDistanceExtensions.DistanceTo(start, end, UnitOfLength.Miles);
+            double grade = GetGradeFromCoordinatesWithElevation(start, end, startElevation, endElevation);
+            return new GpxInterval(start, end, distanceBetweenPoints, grade);
+            }
         }
 
         public static TimeSpan GradeAdjustedPace(TimeSpan pace, double paceAdjustment)
@@ -169,6 +181,7 @@ namespace Pace_Calculator
             
             return gradeAdjustedPace;
         }
+
         //This formula is based on the Strava gradient adjusted pace curve as discused at this link: https://pickletech.eu/blog-gap/
         public static double CalculatePaceAdjustment(double grade)
         {
@@ -269,8 +282,13 @@ namespace Pace_Calculator
                 {
                     foreach(var point in segment.Points)
                     {
-                        double elevation = point.Elevation ?? 0;
-                        elevationPoints.Add(elevation);
+                        if(point.Elevation != null)
+                        {
+                            double elevation = Math.Round((double)point.Elevation, 3);
+                            elevationPoints.Add(elevation);
+                        } else {
+                            elevationPoints.Add(0);
+                        }
                     }
 
                 }
@@ -328,14 +346,34 @@ namespace Pace_Calculator
 
             return markers;
         }
-        public static double GetTotalDistanceFromGpxFile(GpxFile gpxFile, UnitOfLength unitOfLength)
+
+        //returns distance in kilometers only for point to point maps.
+        public static double GetTotalDistanceFromGpxFile(GpxFile gpxFile, string unit)
         {
             List<Coordinates> coordinates = CreateCoordinatesFromGpxFile(gpxFile);
-            UnitOfLength unit = unitOfLength;
             Coordinates start = coordinates [0];
             Coordinates end = coordinates [^1];
 
-            return CoordinatesDistanceExtensions.DistanceTo(start, end, unit);
+            if (unit != "Miles")
+            {
+                return CoordinatesDistanceExtensions.DistanceTo(start, end, UnitOfLength.Kilometers);
+            }
+            return CoordinatesDistanceExtensions.DistanceTo(start, end, UnitOfLength.Miles);
+        }
+
+        public static double SumDistanceFromGpxFile(GpxFile gpxFile, string unit)
+        {
+            var intervals = FindIntervalsFromGpxFile(gpxFile, unit);
+            double totalDistance =  0;
+
+            foreach (var interval in intervals)
+            {
+                if (!double.IsNaN(interval.DistanceBetweenPoints))
+                {
+                    totalDistance += interval.DistanceBetweenPoints;
+                }
+            }
+            return totalDistance;
         }
     }
 }

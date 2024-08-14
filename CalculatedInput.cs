@@ -6,7 +6,7 @@ namespace Pace_Calculator
         public TimeSpan Pace { get; set; } = TimeSpan.FromSeconds(0);
         public double Distance { get; set; } = 0;
         public TimeSpan TotalTime{ get; set; } = TimeSpan.FromSeconds(0);
-        public UnitOfLength Unit { get; set; }
+        public string Unit { get; set; }
 
         public CalculatedInput()
         {

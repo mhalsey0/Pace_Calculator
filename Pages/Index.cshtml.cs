@@ -30,7 +30,7 @@ namespace Pace_Calculator.Pages
         public int TotalSeconds { get; set; }
         
         [BindProperty, Required]
-        public UnitOfLength Unit { get; set; }
+        public string Unit { get; set; }
         
         [BindProperty]
         public IFormFile? GpxFileFromUser { get; set; }
@@ -48,37 +48,9 @@ namespace Pace_Calculator.Pages
             _environment = environment;
         }
 
-        public async Task<IActionResult> OnGetAsync()
+        public void OnGet()
         {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Model state is invalid.");
-                return Page();
-            }
-            try
-            {
-                _logger.LogInformation("Calling Image API");
 
-                if (GpxFileFromUser != null)
-                {
-                    await GPXUploadAsync();
-                    var filePath = Path.Combine(_environment.WebRootPath, "FileUpload", GpxFileFromUser.FileName);
-                    GpxFile gpxFile;
-                    using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                    {
-                        gpxFile = GpxFile.Load(fileStream);
-                    }
-                    ElevationChartUrl = ChartImageGenerator.GenerateChartImage(gpxFile); 
-                }        
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred during post processing.");
-                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
-                return Page();
-            }
-
-            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -91,8 +63,6 @@ namespace Pace_Calculator.Pages
             try
             {
                 _logger.LogInformation("Processing user input.");
-                
-                ModelState.Clear();
 
                 TimeSpan totalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds);
                 TimeSpan pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds);
@@ -107,11 +77,11 @@ namespace Pace_Calculator.Pages
                     {
                         gpxFile = GpxFile.Load(fileStream);
                     }
-                    var distance = Calculators.GetTotalDistanceFromGpxFile(gpxFile, Unit);
+                    var distance = Math.Round(Calculators.SumDistanceFromGpxFile(gpxFile, Unit),2);
 
                     if (totalTime != TimeSpan.Zero)
                     {
-                        TimeSpan pace1 = Calculators.PaceCalculator(totalTime,distance);
+                        TimeSpan pace1 = Calculators.PaceCalculator(totalTime, distance);
                     
                         UserInput userInput1 = new()
                         {
@@ -142,7 +112,8 @@ namespace Pace_Calculator.Pages
                         UpdateProperties(calculatedInput1);
                         var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1); 
                     }
-                    return RedirectToPage();
+                    ElevationChartUrl = ChartImageGenerator.GenerateChartImage(gpxFile); 
+                    return Page();
                 }
                 else
                 {
@@ -162,6 +133,7 @@ namespace Pace_Calculator.Pages
                     PaceCharts = Calculators.CalculatePaceChart(calculatedInput);
 
                     _logger.LogInformation("Processing completed successfully.");
+                    //ModelState.Clear();
                     return Page();
                 }
             }
@@ -207,7 +179,6 @@ namespace Pace_Calculator.Pages
                 }
 
                 var filePath = Path.Combine(uploadPath, safeFileName);
-                System.Console.WriteLine(filePath);
                 
                 await using (var stream = new FileStream(filePath, FileMode.Create))
                 {

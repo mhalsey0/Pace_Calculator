@@ -62,11 +62,11 @@
                         <div id="question5" class="question" style="display:none;">
                             <label>What unit do you want to use?</label><br />
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="Unit" value="miles" id="miles" checked>
+                                <input class="form-check-input" type="radio" name="Unit" value="Miles" id="Miles" checked>
                                 <label class="form-check-label" for="miles">Miles</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="Unit" value="kilometers" id="kilometers">
+                                <input class="form-check-input" type="radio" name="Unit" value="Kilometers" id="Kilometers">
                                 <label class="form-check-label" for="kilometers">Kilometers</label>
                             </div>
                             <button type="button" class="btn btn-primary" onclick="showQuestion(13)">Next</button>                                                        
@@ -129,11 +129,11 @@
                             <label>Please enter the distance:</label><br />
                             <input asp-for="InputDistance" type="number" step="0.01" class="form-control" /><br />
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="Unit" value="miles" id="miles" checked>
+                                <input class="form-check-input" type="radio" name="Unit" value="Miles" id="Miles" checked>
                                 <label class="form-check-label" for="miles">Miles</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="Unit" value="kilometers" id="kilometers">
+                                <input class="form-check-input" type="radio" name="Unit" value="Kilometers" id="Kilometers">
                                 <label class="form-check-label" for="kilometers">Kilometers</label>
                             </div>
                             <button type="button" class="btn btn-primary" onclick="showQuestion(13)">Next</button>
@@ -154,7 +154,7 @@
         <div>
             <table>
                 <tr>
-                    <th>@Model.Unit</th><!--Will need to make this dynamic based on userInput.Unit-->
+                    <th>@Model.Unit</th>
                     <th>Pace</th>
                     <th>Time</th>
                 </tr>
@@ -167,6 +167,28 @@
                     </tr>
                 }
             </table>
+        </div>
+        <div>
+            <fieldset>
+                <legend>Pace</legend>
+                @{TimeSpan pace = new TimeSpan(Model.PaceHours, Model.PaceMinutes, Model.PaceSeconds);}
+                <div>
+                    <label>@pace</label>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Distance</legend>
+                <div>
+                    <label asp-for="InputDistance">@Model.InputDistance</label>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Total Time</legend>
+                @{TimeSpan totalTime = new TimeSpan(Model.TotalHours, Model.TotalMinutes, Model.TotalSeconds);}
+                <div>
+                    <label>@totalTime</label>
+                </div>
+            </fieldset>
         </div>
     }
 

@@ -14,8 +14,8 @@ namespace Pace_Calculator
         public List<Coordinates> EndCoordinates { get; set;}
         public double Distance { get; set; }
         public double Grade { get; set; }
-        public Coordinates Start { get; }
-        public Coordinates End { get; }
-        public double DistanceBetweenPoints { get; }
+        public Coordinates Start { get; set;}
+        public Coordinates End { get; set;}
+        public double DistanceBetweenPoints { get; set;}
     }
 }
