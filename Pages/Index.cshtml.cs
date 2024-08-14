@@ -16,6 +16,22 @@ namespace Pace_Calculator.Pages
         
         [BindProperty, Description("Seconds")]
         public int PaceSeconds { get; set; }
+        [BindProperty, Description("Hours")]
+        public int PaceHoursQ10 { get; set; }
+        
+        [BindProperty, Description("Minutes")]
+        public int PaceMinutesQ10 { get; set; }
+        
+        [BindProperty, Description("Seconds")]
+        public int PaceSecondsQ10 { get; set; }
+        [BindProperty, Description("Hours")]
+        public int PaceHoursQ11 { get; set; }
+        
+        [BindProperty, Description("Minutes")]
+        public int PaceMinutesQ11 { get; set; }
+        
+        [BindProperty, Description("Seconds")]
+        public int PaceSecondsQ11 { get; set; }
         
         [BindProperty, Description("Distance")]
         public double InputDistance { get; set; }
@@ -28,6 +44,14 @@ namespace Pace_Calculator.Pages
         
         [BindProperty, Description("Seconds")]
         public int TotalSeconds { get; set; }
+        [BindProperty, Description("Hours")]
+        public int TotalHoursQ8 { get; set; }
+        
+        [BindProperty, Description("Minutes")]
+        public int TotalMinutesQ8 { get; set; }
+        
+        [BindProperty, Description("Seconds")]
+        public int TotalSecondsQ8 { get; set; }
         
         [BindProperty, Required]
         public string Unit { get; set; }
@@ -65,7 +89,10 @@ namespace Pace_Calculator.Pages
                 _logger.LogInformation("Processing user input.");
 
                 TimeSpan totalTime = new TimeSpan(TotalHours, TotalMinutes, TotalSeconds);
+                TimeSpan totalTimeQ8 = new TimeSpan(TotalHoursQ8, TotalMinutesQ8, TotalSecondsQ8);
                 TimeSpan pace = new TimeSpan(PaceHours, PaceMinutes, PaceSeconds);
+                TimeSpan paceQ10 = new TimeSpan(PaceHoursQ10, PaceMinutesQ10, PaceSecondsQ10);
+                TimeSpan paceQ11 = new TimeSpan(PaceHoursQ11, PaceMinutesQ11, PaceSecondsQ11);
 
                 //Process calculation with GPX file
                 if (GpxFileFromUser != null)
@@ -83,7 +110,7 @@ namespace Pace_Calculator.Pages
                     {
                         TimeSpan pace1 = Calculators.PaceCalculator(totalTime, distance);
                     
-                        UserInput userInput1 = new()
+                        UserInput userInput = new()
                         {
                             Pace = pace1,
                             Distance = distance,
@@ -91,7 +118,7 @@ namespace Pace_Calculator.Pages
                             Unit = Unit,
                             GpxFileFromUser = GpxFileFromUser
                         };
-                        CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
+                        CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput);
                         UpdateProperties(calculatedInput1);
                         var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1); 
                         PaceCharts = gradeAdjustedPaceChart;                       
@@ -101,7 +128,7 @@ namespace Pace_Calculator.Pages
                     {
                         TimeSpan totalTime1 = Calculators.TotalTimeCalculator(pace, distance);
                         
-                        UserInput userInput1 = new()
+                        UserInput userInput = new()
                         {
                             Pace = pace,
                             Distance = distance,
@@ -109,7 +136,7 @@ namespace Pace_Calculator.Pages
                             Unit = Unit,
                             GpxFileFromUser = GpxFileFromUser
                         };
-                        CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput1);
+                        CalculatedInput calculatedInput1 = CalculatedInput.FromUserInput(userInput);
                         UpdateProperties(calculatedInput1);
                         var gradeAdjustedPaceChart = Calculators.CalculateGradeAdjustedPaceChart(gpxFile, calculatedInput1); 
                         PaceCharts = gradeAdjustedPaceChart; 
@@ -120,19 +147,34 @@ namespace Pace_Calculator.Pages
                 else
                 {
                     // Process calculation without GPX file
-                    UserInput userInput = new()
+                    if(totalTimeQ8 != TimeSpan.Zero)
                     {
-                        Pace = pace,
-                        Distance = InputDistance,
-                        TotalTime = totalTime,
-                        Unit = Unit,
-                        GpxFileFromUser = GpxFileFromUser
-                    };
-                    CalculatedInput calculatedInput = Calculators.Calculate(userInput);
-
-                    UpdateProperties(calculatedInput);
-
-                    PaceCharts = Calculators.CalculatePaceChart(calculatedInput);
+                        UserInput userInput = new()
+                        {
+                            Pace = paceQ10,
+                            Distance = InputDistance,
+                            TotalTime = totalTimeQ8,
+                            Unit = Unit,
+                            GpxFileFromUser = GpxFileFromUser
+                        };
+                        CalculatedInput calculatedInput = Calculators.Calculate(userInput);
+                        UpdateProperties(calculatedInput);
+                        PaceCharts = Calculators.CalculatePaceChart(calculatedInput);
+                    }
+                    else
+                    {
+                        UserInput userInput = new()
+                        {
+                            Pace = paceQ11,
+                            Distance = InputDistance,
+                            TotalTime = totalTimeQ8,
+                            Unit = Unit,
+                            GpxFileFromUser = GpxFileFromUser
+                        };
+                        CalculatedInput calculatedInput = Calculators.Calculate(userInput);
+                        UpdateProperties(calculatedInput);
+                        PaceCharts = Calculators.CalculatePaceChart(calculatedInput);                        
+                    }
 
                     _logger.LogInformation("Processing completed successfully.");
                     //ModelState.Clear();
