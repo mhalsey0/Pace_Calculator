@@ -148,7 +148,7 @@ namespace Pace_Calculator
             if (coordinates.Count != elevation.Count)
             {
                 System.Console.WriteLine("Count of coordinates and elevation points are not equal.");
-                return null;
+                return gpxIntervals;
             }
 
             for (int i = 0; i < coordinates.Count - 1; i++)

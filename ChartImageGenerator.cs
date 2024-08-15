@@ -32,7 +32,10 @@ namespace Pace_Calculator
             string chartUrl = new ImageCharts()
                 .cht("lc") // indicates type of graph: line
                 .chs("900x200") // size
+                .chf("bg,s,EFEFEF00")
                 .chd(chartString) // data points
+                .chxt("x")
+                .chxs("0,EFEFEF")
                 .toURL(); // get the generated URL
 
             

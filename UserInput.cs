@@ -7,6 +7,6 @@ namespace Pace_Calculator
         public double Distance { get; set; }
         public TimeSpan TotalTime{ get; set; }
         public string Unit { get; set; }
-        public IFormFile GpxFileFromUser { get; set; }
+        public IFormFile? GpxFileFromUser { get; set; }
     }
 }

@@ -10,10 +10,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>@ViewData["Title"] - My Application</title>
-  <link rel="stylesheet" type="text/css" href="./css/Index.css">
+  <link rel="stylesheet" href="~/css/Pace_Calculator_Styles.css" asp-append-version="true"/>
 </head>
 <body>
-  <div class="container">
     <h1>Welcome to Pace Chart Creator!</h1>
 
     <!-- Button trigger modal -->
@@ -41,8 +40,9 @@
                         </div>
                         <div id="question2" class="question" style="display:none;">
                             <label>Please upload your file:</label><br />
-                            <input asp-for="GpxFileFromUser" type="file" class="form-control-file" /><br />
-                            <button type="button" class="btn btn-primary" onclick="showQuestion(3)">Next</button>
+                            <input asp-for="GpxFileFromUser" type="file" class="form-control-file" id="fileInput" /><br />
+                            <p id="fileWarning" style="color: red; display: none;">Please upload a file before proceeding.</p>
+                            <button type="button" class="btn btn-primary" onclick="validateFileAndProceed(3)">Next</button>
                         </div>
                         <div id="question3" class="question" style="display:none;">
                             <label>Do you have a specific time you want to complete this course?</label><br />
@@ -140,7 +140,9 @@
                             <button type="button" class="btn btn-primary" onclick="showQuestion(13)">Next</button>
                         </div>                                                                                                                                                                    
                         <div id="question13" class="question" style="display:none;">
-                            <label>Summary:</label><br />
+                            <label>Summary:<br />
+                                    Distance: @Model.InputDistance
+                            </label><br />
                             <p id="IndexModel"></p>
                             <button type="submit" class="btn btn-success">Submit</button>
                         </div>
@@ -150,26 +152,37 @@
         </div>
     </div>
 
+    @if(Model.GpxFileFromUser != null)
+    {
+        <div id="elevationChartImage">
+            <img src="@Model.ElevationChartUrl" alt="An image of an elevation profile from the uploaded .gpx file." />
+        </div>
+    }
+
     @if(Model.PaceCharts != null)
     {
-        <div>
-            <table>
-                <tr>
-                    <th>@Model.Unit</th>
-                    <th>Pace</th>
-                    <th>Time</th>
-                </tr>
-                @foreach(var p in Model.PaceCharts)
-                {
+        <div id="paceChartContainer" style="text-align: left; float: right; width: auto; margin-right: 20px;">
+            <table style="width: 100%; table-layout: auto; border-collapse: collapse;">
+                <thead>
                     <tr>
-                        <td>@p.Distance</td>
-                        <td>@p.Pace</td>
-                        <td>@p.CummulativeTime</td>
+                        <th style="white-space: nowrap; text-align: left; padding: 8px 12px;">@Model.Unit</th>
+                        <th style="white-space: nowrap; text-align: left; padding: 8px 12px;">Pace</th>
+                        <th style="white-space: nowrap; text-align: left; padding: 8px 12px;">Time</th>
                     </tr>
-                }
+                </thead>
+                <tbody>
+                    @foreach(var p in Model.PaceCharts)
+                    {
+                        <tr>
+                            <td style="white-space: nowrap; text-align: left; padding: 8px 12px;">@p.Distance</td>
+                            <td style="white-space: nowrap; text-align: left; padding: 8px 12px;">@p.Pace</td>
+                            <td style="white-space: nowrap; text-align: left; padding: 8px 12px;">@p.CummulativeTime</td>
+                        </tr>
+                    }
+                </tbody>
             </table>
         </div>
-        <div>
+        <div id="calculatorResultsContainer">
             <fieldset>
                 <legend>Pace</legend>
                 @{TimeSpan pace = new TimeSpan(Model.PaceHours, Model.PaceMinutes, Model.PaceSeconds);}
@@ -192,18 +205,10 @@
             </fieldset>
         </div>
     }
-
-    @if(Model.GpxFileFromUser != null)
-    {
-        <div>
-            <img src="@Model.ElevationChartUrl" alt="An image of an elevation profile from the uploaded .gpx file." />
-        </div>
-    }
-
   </div>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script>
       function showQuestion(questionNumber, flag) {
@@ -213,6 +218,37 @@
               // Handle the flag logic if necessary
           }
       }
+  </script>
+  <script>
+    function resetForm() {
+    // Reset the form elements
+    document.querySelector('form').reset();
+
+    // Hide all questions
+    document.querySelectorAll('.question').forEach((el) => el.style.display = 'none');
+
+    // Show the first question
+    document.getElementById('question1').style.display = 'block';
+}
+
+  </script>
+  <script>
+    function validateFileAndProceed(nextQuestionNumber) {
+    var fileInput = document.getElementById('fileInput');
+    var fileWarning = document.getElementById('fileWarning');
+
+    // Check if a file is selected
+    if (fileInput.files.length === 0) {
+        // No file selected, show the warning message
+        fileWarning.style.display = 'block';
+    } else {
+        // File is selected, hide the warning message
+        fileWarning.style.display = 'none';
+
+        // Proceed to the next question
+        showQuestion(nextQuestionNumber);
+    }
+}
   </script>
 </body>
 </html>
