@@ -19,7 +19,6 @@
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#questionModal">
         Start Creating your Pace Chart
     </button>
-    <button type="reset" class="btn btn-danger" onclick="resetForm()">Reset</button>
 
     <!-- Modal -->
     <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -140,8 +139,7 @@
                             <button type="button" class="btn btn-primary" onclick="showQuestion(13)">Next</button>
                         </div>                                                                                                                                                                    
                         <div id="question13" class="question" style="display:none;">
-                            <label>Summary:<br />
-                                    Distance: @Model.InputDistance
+                            <label>Calculate by clicking submit.<br />          
                             </label><br />
                             <p id="IndexModel"></p>
                             <button type="submit" class="btn btn-success">Submit</button>
@@ -218,22 +216,6 @@
               // Handle the flag logic if necessary
           }
       }
-  </script>
-  <script>
-    function resetForm() {
-        // Reset the form elements
-        document.querySelector('form').reset();
-
-        // Hide all questions
-        document.querySelectorAll('.question').forEach((el) => el.style.display = 'none');
-
-        // Show the first question
-        document.getElementById('question1').style.display = 'block';
-
-        // Optionally, reload the page to reset all other states
-        location.reload();
-    }
-
   </script>
   <script>
     function validateFileAndProceed(nextQuestionNumber) {

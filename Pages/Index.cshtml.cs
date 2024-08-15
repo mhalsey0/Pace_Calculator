@@ -16,6 +16,7 @@ namespace Pace_Calculator.Pages
         
         [BindProperty, Description("Seconds")]
         public int PaceSeconds { get; set; }
+
         [BindProperty, Description("Hours")]
         public int PaceHoursQ10 { get; set; }
         
@@ -24,6 +25,7 @@ namespace Pace_Calculator.Pages
         
         [BindProperty, Description("Seconds")]
         public int PaceSecondsQ10 { get; set; }
+
         [BindProperty, Description("Hours")]
         public int PaceHoursQ11 { get; set; }
         
@@ -32,6 +34,9 @@ namespace Pace_Calculator.Pages
         
         [BindProperty, Description("Seconds")]
         public int PaceSecondsQ11 { get; set; }
+
+        [BindProperty]
+        public TimeSpan SummaryPace { get; set; }
         
         [BindProperty, Description("Distance")]
         public double InputDistance { get; set; }
@@ -52,14 +57,18 @@ namespace Pace_Calculator.Pages
         
         [BindProperty, Description("Seconds")]
         public int TotalSecondsQ8 { get; set; }
+        [BindProperty]
+        public TimeSpan SummaryTotalTime { get; set; }
         
         [BindProperty, Required]
         public string Unit { get; set; }
         
         [BindProperty]
         public IFormFile? GpxFileFromUser { get; set; }
+
         [BindProperty]
         public List<PaceChart> PaceCharts { get; set; }
+        
         [BindProperty]
         public string? ElevationChartUrl { get; set; }
 
