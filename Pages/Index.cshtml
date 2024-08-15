@@ -221,15 +221,18 @@
   </script>
   <script>
     function resetForm() {
-    // Reset the form elements
-    document.querySelector('form').reset();
+        // Reset the form elements
+        document.querySelector('form').reset();
 
-    // Hide all questions
-    document.querySelectorAll('.question').forEach((el) => el.style.display = 'none');
+        // Hide all questions
+        document.querySelectorAll('.question').forEach((el) => el.style.display = 'none');
 
-    // Show the first question
-    document.getElementById('question1').style.display = 'block';
-}
+        // Show the first question
+        document.getElementById('question1').style.display = 'block';
+
+        // Optionally, reload the page to reset all other states
+        location.reload();
+    }
 
   </script>
   <script>
