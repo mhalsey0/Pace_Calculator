@@ -2,6 +2,11 @@ namespace Pace_Calculator
 {
     public class GpxInterval
     {
+        public double Grade { get; set; }
+        public Coordinates Start { get; set;}
+        public Coordinates End { get; set;}
+        public double DistanceBetweenPoints { get; set;}
+
         public GpxInterval(Coordinates start, Coordinates end, double distanceBetweenPoints, double grade)
         {
             Start = start;
@@ -9,10 +14,5 @@ namespace Pace_Calculator
             DistanceBetweenPoints = distanceBetweenPoints;
             Grade = grade;
         }
-
-        public double Grade { get; set; }
-        public Coordinates Start { get; set;}
-        public Coordinates End { get; set;}
-        public double DistanceBetweenPoints { get; set;}
     }
 }

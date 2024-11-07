@@ -102,43 +102,47 @@ namespace Pace_Calculator
 
         public static List<PaceChart> CalculateGradeAdjustedPaceChart(GpxFile gpxFile, CalculatedInput calculatedInput)
         {
+            // Initialize common variables
             List<GpxInterval> gpxIntervals = FindIntervalsFromGpxFile(gpxFile, calculatedInput.Unit);
             List<PaceChart> gradeAdjustedPaceChart = new List<PaceChart>();
-            double totalDistance = Math.Round(SumDistanceFromGpxFile(gpxFile, calculatedInput.Unit),2);
-            List<int> markers = GetMarkersFromGpxFile(gpxFile,calculatedInput.Unit);
+            double totalDistance = Math.Round(SumDistanceFromGpxFile(gpxFile, calculatedInput.Unit), 2);
             double markerMax = Math.Ceiling(totalDistance);
 
-            if( totalDistance - Math.Floor(totalDistance) == 0)
+            // Calculate full segments (common to both cases)
+            for (int i = 0; i < markerMax; i++)
             {
-                for (int i = 0; i <= markerMax; i++)
-                {
-                    int Marker = i+1;
-                    double Distance = i+1;
-                    double grade = GetAverageGradeFromListofIntervals(gpxIntervals,i,i+1);
-                    TimeSpan Pace = GradeAdjustedPace(calculatedInput.Pace,CalculatePaceAdjustment(grade));
-                    TimeSpan CummulativeTime = (TimeSpan)Pace * i;
-                    gradeAdjustedPaceChart.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));                
-                }
-                return gradeAdjustedPaceChart;
-            }else
-            {
-                for (int i = 0; i <= markerMax; i++)
-                {
-                    int Marker = i+1;
-                    double Distance = i+1;
-                    double grade = GetAverageGradeFromListofIntervals(gpxIntervals,i,i+1);
-                    TimeSpan Pace = GradeAdjustedPace(calculatedInput.Pace,CalculatePaceAdjustment(grade));
-                    TimeSpan CummulativeTime = (TimeSpan)Pace * i;
-                    gradeAdjustedPaceChart.Add(new PaceChart(Marker, Distance, Pace, CummulativeTime));               
-                }
-                int FinalMarker = gradeAdjustedPaceChart.Count;
-                double FinalDistance = Math.Round((double)calculatedInput.Distance - Math.Floor((double)calculatedInput.Distance),2);
-                TimeSpan FinalPace = PaceCalculator(calculatedInput.TotalTime, totalDistance);
-                TimeSpan FinalCummulativeTime = (TimeSpan)calculatedInput.TotalTime;
-                gradeAdjustedPaceChart.Add(new PaceChart(FinalMarker, FinalDistance, FinalPace, FinalCummulativeTime));
-                return gradeAdjustedPaceChart;                 
+                gradeAdjustedPaceChart.Add(CalculateSegment(i, gpxIntervals, calculatedInput.Pace));
             }
+
+            // Add final partial segment if needed
+            if (totalDistance % 1 != 0)
+            {
+                AddFinalSegment(gradeAdjustedPaceChart, calculatedInput, totalDistance);
+            }
+
+            return gradeAdjustedPaceChart;
         }
+
+        private static PaceChart CalculateSegment(int index, List<GpxInterval> gpxIntervals, TimeSpan basePace)
+        {
+            int marker = index + 1;
+            double distance = index + 1;
+            double grade = GetAverageGradeFromListofIntervals(gpxIntervals, index, index + 1);
+            TimeSpan pace = GradeAdjustedPace(basePace, CalculatePaceAdjustment(grade));
+            TimeSpan cumulativeTime = pace * index;
+            
+            return new PaceChart(marker, distance, pace, cumulativeTime);
+        }
+
+        private static void AddFinalSegment(List<PaceChart> chart, CalculatedInput input, double totalDistance)
+        {
+            int finalMarker = chart.Count + 1;
+            double finalDistance = Math.Round(input.Distance - Math.Floor(input.Distance), 2);
+            TimeSpan finalPace = PaceCalculator(input.TotalTime, totalDistance);
+            
+            chart.Add(new PaceChart(finalMarker, finalDistance, finalPace, input.TotalTime));
+        }
+
         public static List<GpxInterval> FindIntervalsFromGpxFile(GpxFile gpxFile, string unit)
         {
             List<GpxInterval> gpxIntervals = new List<GpxInterval>();
